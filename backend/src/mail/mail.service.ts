@@ -18,14 +18,18 @@ export class MailService {
   private readonly baseUrl = required('BASE_URL');
 
   private async loadTemplate(name: string, token: string): Promise<string> {
-    // const templatePath = path.join(__dirname, 'templates', name); PROD!
-    const templatePath = path.resolve(
-      process.cwd(),
-      'src',
-      'mail',
-      'templates',
-      name,
-    );
+    // Prefer compiled templates under dist/ in production, fallback to src/ in development
+    const compiledPath = path.join(__dirname, 'templates', name);
+    let templatePath = compiledPath;
+
+    try {
+      // Check compiled path first
+      await fs.access(compiledPath);
+    } catch {
+      // Fallback to source templates for development
+      templatePath = path.resolve(process.cwd(), 'src', 'mail', 'templates', name);
+    }
+
     let html = await fs.readFile(templatePath, 'utf8');
     const url = `${this.baseUrl}/auth/${token}`;
     html = html.replace(/{{LINK}}/g, url);

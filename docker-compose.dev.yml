@@ -1,17 +1,24 @@
 services:
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
     container_name: backend
     ports:
       - '3000:3000'
     env_file:
       - ./backend/.env
+    environment:
+      - NODE_ENV=development
+      - DB_SYNCHRONIZE=true
     volumes:
       - ./backend:/app
     command: npm run start:dev
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   db:
     image: postgres:15
@@ -22,12 +29,24 @@ services:
       - ./.env
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
 
   redis:
     image: redis:7
     container_name: redis
     ports:
       - '6379:6379'
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
 
 volumes:
   pgdata:

@@ -36,4 +36,5 @@ pgdata/
 coverage/
 
 # REST Client files
-backend/api.http
+backend/api.dev.http
+backend/api.prod.http

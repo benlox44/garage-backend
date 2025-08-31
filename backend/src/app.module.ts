@@ -18,7 +18,8 @@ import { UsersModule } from './users/users.module';
       password: required('DATABASE_PASSWORD'),
       database: required('DATABASE_NAME'),
       entities: [User],
-      synchronize: true, // ⚠️ Disable this in production!
+      // Use env flag to control schema sync (never enable in production)
+      synchronize: process.env.DB_SYNCHRONIZE === 'true',
     }),
     GlobalJwtModule,
     UsersModule,
