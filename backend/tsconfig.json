@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    /* Core Settings */
+    "target": "ES2023",
+    "module": "commonjs",
+    "baseUrl": "./",
+    "strict": true,
+
+    /* Type Checking */
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "strictPropertyInitialization": false,
+
+    /* Emit & Output */
+    "outDir": "./dist",
+    "declaration": true,
+    "sourceMap": true,
+    "removeComments": true,
+    "incremental": true,
+
+    /* Decorators & Metadata */
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    /* Module Resolution */
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+  },
+  "include": ["src", "src/mail/templates/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.spec.ts"],
+}
