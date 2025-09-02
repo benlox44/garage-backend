@@ -20,6 +20,8 @@ import { UsersModule } from './users/users.module';
       entities: [User],
       // Use env flag to control schema sync (never enable in production)
       synchronize: process.env.DB_SYNCHRONIZE === 'true',
+      // Enable SSL for managed clouds like Azure when DATABASE_SSL=true
+      ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
     }),
     GlobalJwtModule,
     UsersModule,
