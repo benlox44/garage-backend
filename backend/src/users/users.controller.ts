@@ -10,6 +10,7 @@ import {
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
+import { AdminGuard } from 'src/auth/guards/admin.guard';
 import { CurrentUser } from 'src/jwt/decorators/current-user.decorator';
 import { JwtPayload } from 'src/jwt/types/jwt-payload.type';
 
@@ -86,12 +87,14 @@ export class UsersController {
 
   // ===== ADMIN ACTIONS =====
 
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @Get()
   public async findAll(): Promise<{ data: SafeUser[] }> {
     const data = await this.usersService.findAll();
     return { data };
   }
 
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @Delete(':id')
   public async deleteById(
     @Param('id', ParseIntPipe) id: number,

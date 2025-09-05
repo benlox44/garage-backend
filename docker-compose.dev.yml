@@ -3,7 +3,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
-    container_name: backend
+    restart: unless-stopped
     ports:
       - '3000:3000'
     env_file:
@@ -22,7 +22,7 @@ services:
 
   db:
     image: postgres:15
-    container_name: db
+    restart: unless-stopped
     ports:
       - '5432:5432'
     env_file:
@@ -38,7 +38,7 @@ services:
 
   redis:
     image: redis:7
-    container_name: redis
+    restart: unless-stopped
     ports:
       - '6379:6379'
     healthcheck:

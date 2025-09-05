@@ -1,9 +1,6 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
+
+import { ROLE, type Role } from 'src/common/constants/role.constant';
 
 @Entity()
 export class User {
@@ -12,6 +9,9 @@ export class User {
 
   @CreateDateColumn()
   public createdAt: Date;
+
+  @Column({ type: 'varchar', default: ROLE.CLIENT })
+  public role: Role;
 
   @Column({ default: false })
   public isLocked: boolean;

@@ -1,0 +1,26 @@
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
+
+import { ROLE } from 'src/common/constants/role.constant';
+import { UsersService } from 'src/users/users.service';
+
+import { AuthRequest } from '../interfaces/auth-request.interface';
+
+@Injectable()
+export class AdminGuard implements CanActivate {
+  public constructor(private readonly usersService: UsersService) {}
+
+  public async canActivate(context: ExecutionContext): Promise<boolean> {
+    const req = context.switchToHttp().getRequest<AuthRequest>();
+    const userId = req.user?.sub;
+
+    if (!userId) throw new ForbiddenException('Missing authenticated user');
+
+    const user = await this.usersService.findByIdOrThrow(userId);
+    if (user.role !== ROLE.ADMIN) {
+      throw new ForbiddenException('Admin privileges required');
+    }
+
+    return true;
+  }
+}
+

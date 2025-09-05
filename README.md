@@ -1,6 +1,6 @@
 # 🚀 Full-Stack Project
 
-Project for UCN (Cloud Computing)
+Backend Project for UCN (Cloud Computing)
 
 ## 🐳 Run the project (Docker)
 
