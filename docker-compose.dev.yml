@@ -13,6 +13,7 @@ services:
       - DB_SYNCHRONIZE=true
     volumes:
       - ./backend:/app
+      - /app/node_modules  # Exclude node_modules from volume mount
     command: npm run start:dev
     depends_on:
       db:
