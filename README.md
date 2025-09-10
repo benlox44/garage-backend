@@ -12,6 +12,10 @@ docker compose -f docker-compose.dev.yml up   # Dev
 
 > Make sure to set up .env files
 
+Environment additions:
+- `backend/.env`: add `ADMIN_EMAILS` as a comma/space/semicolon separated list. Any user who registers or logs in with an email in this list is promoted to ADMIN automatically.
+  - Example: `ADMIN_EMAILS=admin1@example.com, admin2@example.com;admin3@example.com`
+
 ## 📁 Project Structure
 
 - `/` - Docker setup and global configuration

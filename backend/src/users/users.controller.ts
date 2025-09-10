@@ -17,6 +17,7 @@ import { JwtPayload } from 'src/jwt/types/jwt-payload.type';
 import { UpdateUserDto } from './dto/update-user-dto';
 import { UpdateUserEmailDto } from './dto/update-user-email.dto';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
+import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { SafeUser } from './types/safe-user.type';
 import { UsersService } from './users.service';
 
@@ -101,5 +102,15 @@ export class UsersController {
   ): Promise<{ message: string }> {
     await this.usersService.delete(id);
     return { message: `User with ID ${id} deleted successfully` };
+  }
+
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
+  @Patch(':id/role')
+  public async updateRole(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateUserRoleDto,
+  ): Promise<{ message: string }> {
+    await this.usersService.updateRole(id, dto.role);
+    return { message: `User with ID ${id} role updated to ${dto.role}` };
   }
 }

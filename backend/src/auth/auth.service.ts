@@ -9,6 +9,7 @@ import bcrypt from 'bcryptjs';
 
 import { JWT_EXPIRES_IN } from 'src/common/constants/jwt-expires-in.constant';
 import { JWT_PURPOSE } from 'src/common/constants/jwt-purpose.constant';
+import { ROLE } from 'src/common/constants/role.constant';
 import { LOGIN_BLOCK } from 'src/common/constants/login-block.constant';
 import { AppJwtService } from 'src/jwt/jwt.service';
 import { MailService } from 'src/mail/mail.service';
@@ -143,9 +144,14 @@ export class AuthService {
     await this.usersService.ensureEmailIsAvailable(dto.email);
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const isAdmin = this.isAdminEmail(dto.email);
     const user = await this.usersService.save({
-      ...dto,
+      // Pick only allowed fields explicitly to avoid role injection
+      name: dto.name,
+      email: dto.email,
       password: hashedPassword,
+      // Auto-assign ADMIN role if email is in ADMIN_EMAILS
+      role: isAdmin ? ROLE.ADMIN : undefined,
     } as User);
 
     const token = this.jwtService.sign(
@@ -157,6 +163,12 @@ export class AuthService {
 
   public async login(dto: LoginDto): Promise<string> {
     const user = await this.validateUserCredentials(dto);
+
+    // Promote to ADMIN if email matches ADMIN_EMAILS
+    if (user.role !== ROLE.ADMIN && this.isAdminEmail(user.email)) {
+      await this.usersService.updateRole(user.id, ROLE.ADMIN);
+    }
+
     const accesToken = this.jwtService.sign(
       { purpose: JWT_PURPOSE.SESSION, sub: user.id, email: user.email },
       JWT_EXPIRES_IN.SESSION,
@@ -296,5 +308,16 @@ export class AuthService {
     if (!user.isEmailConfirmed)
       throw new ForbiddenException('Email not confirmed');
     return user;
+  }
+
+  // ===== INTERNAL UTILS =====
+  private isAdminEmail(email: string): boolean {
+    const raw = process.env.ADMIN_EMAILS || '';
+    if (!raw) return false;
+    const list = raw
+      .split(/[\s,;]+/)
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean);
+    return list.includes(email.toLowerCase());
   }
 }

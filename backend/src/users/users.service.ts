@@ -156,6 +156,14 @@ export class UsersService {
     await this.save(user);
   }
 
+  public async updateRole(id: number, role: User['role']): Promise<void> {
+    const user = await this.findByIdOrThrow(id);
+    if (user.role === role)
+      throw new ConflictException('User already has this role');
+    user.role = role;
+    await this.save(user);
+  }
+
   // ===== DELETE METHODS =====
 
   public async delete(id: number): Promise<void> {
