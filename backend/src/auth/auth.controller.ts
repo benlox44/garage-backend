@@ -3,7 +3,6 @@ import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
-import { RequestConfirmationEmailDto } from './dto/request-confirmation-email.dto';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { RequestUnlockDto } from './dto/request-unlock.dto';
 import { ResetPasswordAfterRevertDto } from './dto/reset-password-after-revert.dto';
@@ -72,16 +71,6 @@ export class AuthController {
   public async login(@Body() dto: LoginDto): Promise<{ access_token: string }> {
     const access_token = await this.authService.login(dto);
     return { access_token };
-  }
-
-  @Post('request-confirmation-email')
-  public async requestConfirmationEmail(
-    @Body() dto: RequestConfirmationEmailDto,
-  ): Promise<{ message: string }> {
-    await this.authService.requestConfirmationEmail(dto);
-    return {
-      message: 'If your email is registered and not confirmed, a link was sent',
-    };
   }
 
   @Post('request-password-reset')

@@ -9,8 +9,8 @@ import bcrypt from 'bcryptjs';
 
 import { JWT_EXPIRES_IN } from 'src/common/constants/jwt-expires-in.constant';
 import { JWT_PURPOSE } from 'src/common/constants/jwt-purpose.constant';
-import { ROLE } from 'src/common/constants/role.constant';
 import { LOGIN_BLOCK } from 'src/common/constants/login-block.constant';
+import { ROLE } from 'src/common/constants/role.constant';
 import { AppJwtService } from 'src/jwt/jwt.service';
 import { MailService } from 'src/mail/mail.service';
 import { UsersRedisService } from 'src/redis/services/users-redis.service';
@@ -19,7 +19,6 @@ import { UsersService } from 'src/users/users.service';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
-import { RequestConfirmationEmailDto } from './dto/request-confirmation-email.dto';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { RequestUnlockDto } from './dto/request-unlock.dto';
 import { ResetPasswordAfterRevertDto } from './dto/reset-password-after-revert.dto';
@@ -176,18 +175,8 @@ export class AuthService {
     return accesToken;
   }
 
-  public async requestConfirmationEmail(
-    dto: RequestConfirmationEmailDto,
-  ): Promise<void> {
-    const user = await this.usersService.findByEmail(dto.email);
-    if (!user || user.isEmailConfirmed) return;
-
-    const token = this.jwtService.sign(
-      { purpose: JWT_PURPOSE.CONFIRM_EMAIL, sub: user.id, email: user.email },
-      JWT_EXPIRES_IN.CONFIRM_EMAIL,
-    );
-    await this.mailService.sendConfirmationEmail(user.email, token);
-  }
+  // Removed: requestConfirmationEmail. Tokens last 1 day; accounts older than
+  // 24h and unconfirmed are deleted automatically on startup.
 
   public async requestPasswordReset(
     dto: RequestPasswordResetDto,
@@ -286,17 +275,6 @@ export class AuthService {
 
       if (failures >= LOGIN_BLOCK.MAX_FAILURES) {
         await this.usersService.lock(user.id);
-
-        const token = this.jwtService.sign(
-          {
-            purpose: JWT_PURPOSE.UNLOCK_ACCOUNT,
-            sub: user.id,
-            email: user.email,
-          },
-          JWT_EXPIRES_IN.UNLOCK_ACCOUNT,
-        );
-        await this.mailService.sendUnlockAccount(user.email, token);
-
         throw new ForbiddenException(
           'Account has been locked due to failed attempts',
         );

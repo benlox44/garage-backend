@@ -9,9 +9,10 @@ export class UserCleanupService implements OnModuleInit {
   public constructor(private readonly usersService: UsersService) {}
 
   public async onModuleInit(): Promise<void> {
-    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const result =
-      await this.usersService.deleteUnconfirmedOlderThan(oneWeekAgo);
-    this.logger.log(`🧹 [Init] Deleted unconfirmed users: ${result.affected}`);
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const result = await this.usersService.deleteUnconfirmedOlderThan(oneDayAgo);
+    this.logger.log(
+      `🧹 [Init] Deleted unconfirmed users older than 24h: ${result.affected}`,
+    );
   }
 }
