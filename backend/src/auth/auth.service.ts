@@ -7,6 +7,13 @@ import {
 } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 
+import { CreateUserDto } from './dto/create-user.dto.js';
+import { LoginDto } from './dto/login.dto.js';
+import { RequestPasswordResetDto } from './dto/request-password-reset.dto.js';
+import { RequestUnlockDto } from './dto/request-unlock.dto.js';
+import { ResetPasswordAfterRevertDto } from './dto/reset-password-after-revert.dto.js';
+import { ResetPasswordDto } from './dto/reset-password.dto.js';
+
 import { JWT_EXPIRES_IN } from '../common/constants/jwt-expires-in.constant.js';
 import { JWT_PURPOSE } from '../common/constants/jwt-purpose.constant.js';
 import { LOGIN_BLOCK } from '../common/constants/login-block.constant.js';
@@ -17,12 +24,6 @@ import { UsersRedisService } from '../redis/services/users-redis.service.js';
 import { User } from '../users/entities/user.entity.js';
 import { UsersService } from '../users/users.service.js';
 
-import { CreateUserDto } from './dto/create-user.dto.js';
-import { LoginDto } from './dto/login.dto.js';
-import { RequestPasswordResetDto } from './dto/request-password-reset.dto.js';
-import { RequestUnlockDto } from './dto/request-unlock.dto.js';
-import { ResetPasswordAfterRevertDto } from './dto/reset-password-after-revert.dto.js';
-import { ResetPasswordDto } from './dto/reset-password.dto.js';
 
 /**
  * AuthService
@@ -165,7 +166,7 @@ export class AuthService {
 
     // Promote to ADMIN if email matches ADMIN_EMAILS
     if (user.role !== ROLE.ADMIN && this.isAdminEmail(user.email)) {
-      await this.usersService.updateRole(user.id, ROLE.ADMIN);
+      await this.usersService.promoteToAdmin(user.id);
     }
 
     const accesToken = this.jwtService.sign(

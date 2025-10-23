@@ -6,20 +6,22 @@ import {
   Param,
   ParseIntPipe,
   Patch,
+  Post,
 } from '@nestjs/common';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
-import { AdminGuard } from '../auth/guards/admin.guard.js';
-import { CurrentUser } from '../jwt/decorators/current-user.decorator.js';
-import { JwtPayload } from '../jwt/types/jwt-payload.type.js';
 
 import { UpdateUserDto } from './dto/update-user-dto.js';
 import { UpdateUserEmailDto } from './dto/update-user-email.dto.js';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto.js';
-import { UpdateUserRoleDto } from './dto/update-user-role.dto.js';
 import { SafeUser } from './types/safe-user.type.js';
 import { UsersService } from './users.service.js';
+
+import { CreateUserDto } from '../auth/dto/create-user.dto.js';
+import { AdminGuard } from '../auth/guards/admin.guard.js';
+import { CurrentUser } from '../jwt/decorators/current-user.decorator.js';
+import { JwtPayload } from '../jwt/types/jwt-payload.type.js';
 
 /**
  * UsersController
@@ -105,12 +107,14 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard('jwt'), AdminGuard)
-  @Patch(':id/role')
-  public async updateRole(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateUserRoleDto,
-  ): Promise<{ message: string }> {
-    await this.usersService.updateRole(id, dto.role);
-    return { message: `User with ID ${id} role updated to ${dto.role}` };
+  @Post('create-mechanic')
+  public async createMechanic(
+    @Body() dto: CreateUserDto,
+  ): Promise<{ message: string; data: SafeUser }> {
+    const data = await this.usersService.createMechanic(dto);
+    return { 
+      message: 'Mechanic created successfully',
+      data 
+    };
   }
 }

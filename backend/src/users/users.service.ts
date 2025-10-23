@@ -9,17 +9,20 @@ import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcryptjs';
 import { DeleteResult, LessThan, Repository } from 'typeorm';
 
-import { JWT_EXPIRES_IN } from '../common/constants/jwt-expires-in.constant.js';
-import { JWT_PURPOSE } from '../common/constants/jwt-purpose.constant.js';
-import { AppJwtService } from '../jwt/jwt.service.js';
-import { MailService } from '../mail/mail.service.js';
-import { toSafeUser } from './utils/to-safe-user.js';
-
 import { UpdateUserDto } from './dto/update-user-dto.js';
 import { UpdateUserEmailDto } from './dto/update-user-email.dto.js';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto.js';
 import { User } from './entities/user.entity.js';
 import { SafeUser } from './types/safe-user.type.js';
+import { toSafeUser } from './utils/to-safe-user.js';
+
+import { CreateUserDto } from '../auth/dto/create-user.dto.js';
+import { JWT_EXPIRES_IN } from '../common/constants/jwt-expires-in.constant.js';
+import { JWT_PURPOSE } from '../common/constants/jwt-purpose.constant.js';  
+import { ROLE } from '../common/constants/role.constant.js';
+import { AppJwtService } from '../jwt/jwt.service.js';
+import { MailService } from '../mail/mail.service.js';
+
 
 /**
  * UsersService
@@ -156,11 +159,32 @@ export class UsersService {
     await this.save(user);
   }
 
-  public async updateRole(id: number, role: User['role']): Promise<void> {
+  public async createMechanic(dto: CreateUserDto): Promise<SafeUser> {
+    // Check if email already exists
+    const existingUser = await this.findByEmail(dto.email);
+    if (existingUser) {
+      throw new ConflictException('Email already exists');
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    // Create mechanic user
+    const mechanicUser = this.usersRepository.create({
+      email: dto.email,
+      password: hashedPassword,
+      name: dto.name,
+      role: ROLE.MECHANIC,
+      isEmailConfirmed: true, // Admin-created mechanics are automatically confirmed
+    });
+
+    const savedUser = await this.save(mechanicUser);
+    return toSafeUser(savedUser);
+  }
+
+  public async promoteToAdmin(id: number): Promise<void> {
     const user = await this.findByIdOrThrow(id);
-    if (user.role === role)
-      throw new ConflictException('User already has this role');
-    user.role = role;
+    user.role = ROLE.ADMIN;
     await this.save(user);
   }
 
