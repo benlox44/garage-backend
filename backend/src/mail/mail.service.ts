@@ -4,7 +4,7 @@ import path from 'path';
 import { Injectable } from '@nestjs/common';
 import nodemailer from 'nodemailer';
 
-import { required } from 'src/common/config/env.config';
+import { required } from '../common/config/env.config.js';
 
 @Injectable()
 export class MailService {

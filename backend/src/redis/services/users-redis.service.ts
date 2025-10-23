@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
 
-import { LOGIN_BLOCK } from 'src/common/constants/login-block.constant';
+import { LOGIN_BLOCK } from '../../common/constants/login-block.constant.js';
 
 @Injectable()
 export class UsersRedisService {

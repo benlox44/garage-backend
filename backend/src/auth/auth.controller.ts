@@ -1,12 +1,12 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 
-import { AuthService } from './auth.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { LoginDto } from './dto/login.dto';
-import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
-import { RequestUnlockDto } from './dto/request-unlock.dto';
-import { ResetPasswordAfterRevertDto } from './dto/reset-password-after-revert.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
+import { AuthService } from './auth.service.js';
+import { CreateUserDto } from './dto/create-user.dto.js';
+import { LoginDto } from './dto/login.dto.js';
+import { RequestPasswordResetDto } from './dto/request-password-reset.dto.js';
+import { RequestUnlockDto } from './dto/request-unlock.dto.js';
+import { ResetPasswordAfterRevertDto } from './dto/reset-password-after-revert.dto.js';
+import { ResetPasswordDto } from './dto/reset-password.dto.js';
 
 /**
  * AuthController

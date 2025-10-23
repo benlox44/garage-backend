@@ -7,22 +7,22 @@ import {
 } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 
-import { JWT_EXPIRES_IN } from 'src/common/constants/jwt-expires-in.constant';
-import { JWT_PURPOSE } from 'src/common/constants/jwt-purpose.constant';
-import { LOGIN_BLOCK } from 'src/common/constants/login-block.constant';
-import { ROLE } from 'src/common/constants/role.constant';
-import { AppJwtService } from 'src/jwt/jwt.service';
-import { MailService } from 'src/mail/mail.service';
-import { UsersRedisService } from 'src/redis/services/users-redis.service';
-import { User } from 'src/users/entities/user.entity';
-import { UsersService } from 'src/users/users.service';
+import { JWT_EXPIRES_IN } from '../common/constants/jwt-expires-in.constant.js';
+import { JWT_PURPOSE } from '../common/constants/jwt-purpose.constant.js';
+import { LOGIN_BLOCK } from '../common/constants/login-block.constant.js';
+import { ROLE } from '../common/constants/role.constant.js';
+import { AppJwtService } from '../jwt/jwt.service.js';
+import { MailService } from '../mail/mail.service.js';
+import { UsersRedisService } from '../redis/services/users-redis.service.js';
+import { User } from '../users/entities/user.entity.js';
+import { UsersService } from '../users/users.service.js';
 
-import { CreateUserDto } from './dto/create-user.dto';
-import { LoginDto } from './dto/login.dto';
-import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
-import { RequestUnlockDto } from './dto/request-unlock.dto';
-import { ResetPasswordAfterRevertDto } from './dto/reset-password-after-revert.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
+import { CreateUserDto } from './dto/create-user.dto.js';
+import { LoginDto } from './dto/login.dto.js';
+import { RequestPasswordResetDto } from './dto/request-password-reset.dto.js';
+import { RequestUnlockDto } from './dto/request-unlock.dto.js';
+import { ResetPasswordAfterRevertDto } from './dto/reset-password-after-revert.dto.js';
+import { ResetPasswordDto } from './dto/reset-password.dto.js';
 
 /**
  * AuthService

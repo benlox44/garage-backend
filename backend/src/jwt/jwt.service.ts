@@ -7,11 +7,11 @@ import {
 } from '@nestjs/common';
 import { JwtService as NestJwtService } from '@nestjs/jwt';
 
-import { JwtPayload, JwtPayloadBase } from './types/jwt-payload.type';
+import { JwtPayload, JwtPayloadBase } from './types/jwt-payload.type.js';
 
-import { JwtExpiresIn } from '../common/constants/jwt-expires-in.constant';
-import { JwtPurpose } from '../common/constants/jwt-purpose.constant';
-import { JwtRedisService } from '../redis/services/jwt-redis.service';
+import { JwtExpiresIn } from '../common/constants/jwt-expires-in.constant.js';
+import { JwtPurpose } from '../common/constants/jwt-purpose.constant.js';
+import { JwtRedisService } from '../redis/services/jwt-redis.service.js';
 
 @Injectable()
 export class AppJwtService {

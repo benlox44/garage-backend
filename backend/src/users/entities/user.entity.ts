@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-import { ROLE, type Role } from 'src/common/constants/role.constant';
+import { ROLE, type Role } from '../../common/constants/role.constant.js';
 
 @Entity()
 export class User {

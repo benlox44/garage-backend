@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 
-import { UsersService } from '../users.service';
+import { UsersService } from '../users.service.js';
 
 @Injectable()
 export class UserCleanupService implements OnModuleInit {

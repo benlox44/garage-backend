@@ -45,8 +45,6 @@ Even though Docker runs everything, the following commands can be useful for loc
 
 ### ✅ Lint
 
-Work for `backend` & `frontend`
-
 ```bash
 npm run lint         # Auto-fix issues
 npm run lint:check   # Check only
@@ -57,7 +55,3 @@ npm run lint:check   # Check only
 ```bash
 npm run test
 ```
-
-## 🗂️ To do List
-
-- frontend

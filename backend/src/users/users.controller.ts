@@ -10,16 +10,16 @@ import {
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
-import { AdminGuard } from 'src/auth/guards/admin.guard';
-import { CurrentUser } from 'src/jwt/decorators/current-user.decorator';
-import { JwtPayload } from 'src/jwt/types/jwt-payload.type';
+import { AdminGuard } from '../auth/guards/admin.guard.js';
+import { CurrentUser } from '../jwt/decorators/current-user.decorator.js';
+import { JwtPayload } from '../jwt/types/jwt-payload.type.js';
 
-import { UpdateUserDto } from './dto/update-user-dto';
-import { UpdateUserEmailDto } from './dto/update-user-email.dto';
-import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
-import { UpdateUserRoleDto } from './dto/update-user-role.dto';
-import { SafeUser } from './types/safe-user.type';
-import { UsersService } from './users.service';
+import { UpdateUserDto } from './dto/update-user-dto.js';
+import { UpdateUserEmailDto } from './dto/update-user-email.dto.js';
+import { UpdateUserPasswordDto } from './dto/update-user-password.dto.js';
+import { UpdateUserRoleDto } from './dto/update-user-role.dto.js';
+import { SafeUser } from './types/safe-user.type.js';
+import { UsersService } from './users.service.js';
 
 /**
  * UsersController

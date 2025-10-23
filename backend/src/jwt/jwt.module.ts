@@ -1,10 +1,10 @@
 import { Global, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 
-import { required } from 'src/common/config/env.config';
-import { RedisModule } from 'src/redis/redis.module';
+import { required } from '../common/config/env.config.js';
+import { RedisModule } from '../redis/redis.module.js';
 
-import { AppJwtService } from './jwt.service';
+import { AppJwtService } from './jwt.service.js';
 
 @Global()
 @Module({

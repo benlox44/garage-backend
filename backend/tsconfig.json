@@ -2,7 +2,7 @@
   "compilerOptions": {
     /* Core Settings */
     "target": "ES2023",
-    "module": "commonjs",
+    "module": "ES2022",
     "strict": true,
 
     /* Type Checking */

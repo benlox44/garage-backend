@@ -1,5 +1,5 @@
-import { User } from 'src/users/entities/user.entity';
-import { SafeUser } from 'src/users/types/safe-user.type';
+import { User } from '../entities/user.entity.js';
+import { SafeUser } from '../types/safe-user.type.js';
 
 export function toSafeUser(user: User): SafeUser {
   const { password: _password, ...safeUser } = user;

@@ -9,17 +9,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcryptjs';
 import { DeleteResult, LessThan, Repository } from 'typeorm';
 
-import { JWT_EXPIRES_IN } from 'src/common/constants/jwt-expires-in.constant';
-import { JWT_PURPOSE } from 'src/common/constants/jwt-purpose.constant';
-import { AppJwtService } from 'src/jwt/jwt.service';
-import { MailService } from 'src/mail/mail.service';
-import { toSafeUser } from 'src/users/utils/to-safe-user';
+import { JWT_EXPIRES_IN } from '../common/constants/jwt-expires-in.constant.js';
+import { JWT_PURPOSE } from '../common/constants/jwt-purpose.constant.js';
+import { AppJwtService } from '../jwt/jwt.service.js';
+import { MailService } from '../mail/mail.service.js';
+import { toSafeUser } from './utils/to-safe-user.js';
 
-import { UpdateUserDto } from './dto/update-user-dto';
-import { UpdateUserEmailDto } from './dto/update-user-email.dto';
-import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
-import { User } from './entities/user.entity';
-import { SafeUser } from './types/safe-user.type';
+import { UpdateUserDto } from './dto/update-user-dto.js';
+import { UpdateUserEmailDto } from './dto/update-user-email.dto.js';
+import { UpdateUserPasswordDto } from './dto/update-user-password.dto.js';
+import { User } from './entities/user.entity.js';
+import { SafeUser } from './types/safe-user.type.js';
 
 /**
  * UsersService

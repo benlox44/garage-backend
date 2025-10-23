@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { AuthModule } from './auth/auth.module';
-import { required } from './common/config/env.config';
-import { GlobalJwtModule } from './jwt/jwt.module';
-import { User } from './users/entities/user.entity';
-import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module.js';
+import { required } from './common/config/env.config.js';
+import { GlobalJwtModule } from './jwt/jwt.module.js';
+import { User } from './users/entities/user.entity.js';
+import { UsersModule } from './users/users.module.js';
 
 @Module({
   imports: [

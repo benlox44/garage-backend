@@ -1,4 +1,4 @@
-import { JwtPurpose } from '../../common/constants/jwt-purpose.constant';
+import { JwtPurpose } from '../../common/constants/jwt-purpose.constant.js';
 
 export type JwtPayloadBase = {
   purpose: JwtPurpose;

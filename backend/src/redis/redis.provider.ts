@@ -1,6 +1,6 @@
 import { Redis } from 'ioredis';
 
-import { required } from 'src/common/config/env.config';
+import { required } from '../common/config/env.config.js';
 
 export const RedisProvider = {
   provide: 'REDIS_CLIENT',

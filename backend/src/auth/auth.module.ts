@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 
-import { JwtStrategy } from 'src/auth/strategies/jwt.strategy';
-import { MailModule } from 'src/mail/mail.module';
-import { RedisModule } from 'src/redis/redis.module';
-import { UsersRedisService } from 'src/redis/services/users-redis.service';
-import { UsersModule } from 'src/users/users.module';
+import { JwtStrategy } from './strategies/jwt.strategy.js';
+import { MailModule } from '../mail/mail.module.js';
+import { RedisModule } from '../redis/redis.module.js';
+import { UsersRedisService } from '../redis/services/users-redis.service.js';
+import { UsersModule } from '../users/users.module.js';
 
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { AuthController } from './auth.controller.js';
+import { AuthService } from './auth.service.js';
 @Module({
   imports: [MailModule, RedisModule, UsersModule],
   providers: [AuthService, JwtStrategy, UsersRedisService],

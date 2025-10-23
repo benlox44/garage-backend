@@ -1,9 +1,9 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 
-import { ROLE } from 'src/common/constants/role.constant';
-import { UsersService } from 'src/users/users.service';
+import { ROLE } from '../../common/constants/role.constant.js';
+import { UsersService } from '../../users/users.service.js';
 
-import { AuthRequest } from '../interfaces/auth-request.interface';
+import { AuthRequest } from '../interfaces/auth-request.interface.js';
 
 @Injectable()
 export class AdminGuard implements CanActivate {
