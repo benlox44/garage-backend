@@ -20,7 +20,6 @@ Environment additions:
 
 - `/` - Docker setup and global configuration
 - `/backend` - NestJS API with authentication and user management
-- `/frontend` - (planned) web client interface
 
 ## 📌 Stack
 

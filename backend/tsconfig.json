@@ -3,7 +3,6 @@
     /* Core Settings */
     "target": "ES2023",
     "module": "commonjs",
-    "baseUrl": "./",
     "strict": true,
 
     /* Type Checking */
@@ -26,7 +25,7 @@
     /* Module Resolution */
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
   },
   "include": ["src", "src/mail/templates/**/*"],
   "exclude": ["node_modules", "dist", "**/*.spec.ts"],
