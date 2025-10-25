@@ -13,49 +13,15 @@ import { ResetPasswordDto } from './dto/reset-password.dto.js';
  *
  * Controller responsible for handling authentication and authorization flows.
  *
- * Exposes endpoints separated by HTTP method:
- * - GET METHODS: Confirm email, revert email, unlock account using tokens.
+ * Exposes endpoints organized by HTTP method:
  * - POST METHODS: Register, login, request password reset, reset password, request unlock.
+ * - GET METHODS: Confirm email, revert email, unlock account using tokens.
  *
  * Routes manage user sessions and account recovery processes.
  */
 @Controller('auth')
 export class AuthController {
   public constructor(private readonly authService: AuthService) {}
-
-  // ===== GET METHODS =====
-
-  @Get('confirm-email')
-  public async confirmEmail(
-    @Query('token') token: string,
-  ): Promise<{ message: string }> {
-    await this.authService.confirmEmail(token);
-    return { message: 'Email confirmed successfuly' };
-  }
-
-  @Get('confirm-email-update')
-  public async confirmEmailUpdate(
-    @Query('token') token: string,
-  ): Promise<{ message: string }> {
-    await this.authService.confirmEmailUpdate(token);
-    return { message: 'Email changed successfully' };
-  }
-
-  @Get('revert-email')
-  public async revertEmail(
-    @Query('token') token: string,
-  ): Promise<{ reset_token: string }> {
-    const reset_token = await this.authService.revertEmail(token);
-    return { reset_token };
-  }
-
-  @Get('unlock-account')
-  public async unlockAccount(
-    @Query('token') token: string,
-  ): Promise<{ message: string }> {
-    await this.authService.unlockAccount(token);
-    return { message: 'Your account has been unlocked. You can now log in' };
-  }
 
   // ===== POST METHODS =====
 
@@ -109,5 +75,39 @@ export class AuthController {
     return {
       message: 'If your email is registered and is locked, a link was sent',
     };
+  }
+
+  // ===== GET METHODS =====
+
+  @Get('confirm-email')
+  public async confirmEmail(
+    @Query('token') token: string,
+  ): Promise<{ message: string }> {
+    await this.authService.confirmEmail(token);
+    return { message: 'Email confirmed successfuly' };
+  }
+
+  @Get('confirm-email-update')
+  public async confirmEmailUpdate(
+    @Query('token') token: string,
+  ): Promise<{ message: string }> {
+    await this.authService.confirmEmailUpdate(token);
+    return { message: 'Email changed successfully' };
+  }
+
+  @Get('revert-email')
+  public async revertEmail(
+    @Query('token') token: string,
+  ): Promise<{ reset_token: string }> {
+    const reset_token = await this.authService.revertEmail(token);
+    return { reset_token };
+  }
+
+  @Get('unlock-account')
+  public async unlockAccount(
+    @Query('token') token: string,
+  ): Promise<{ message: string }> {
+    await this.authService.unlockAccount(token);
+    return { message: 'Your account has been unlocked. You can now log in' };
   }
 }

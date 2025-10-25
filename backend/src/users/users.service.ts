@@ -51,6 +51,34 @@ export class UsersService {
     private readonly mailService: MailService,
   ) {}
 
+  // ===== POST METHODS =====
+
+  public save(user: User): Promise<User> {
+    return this.usersRepository.save(user);
+  }
+
+  public async createMechanic(dto: CreateUserDto): Promise<void> {
+    // Check if email already exists
+    const existingUser = await this.findByEmail(dto.email);
+    if (existingUser) {
+      throw new ConflictException('Email already exists');
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    // Create mechanic user
+    const mechanicUser = this.usersRepository.create({
+      email: dto.email,
+      password: hashedPassword,
+      name: dto.name,
+      role: ROLE.MECHANIC,
+      isEmailConfirmed: true, // Admin-created mechanics are automatically confirmed
+    });
+
+    await this.save(mechanicUser);
+  }
+
   // ===== GET METHODS =====
 
   public async findAll(): Promise<SafeUser[]> {
@@ -75,12 +103,6 @@ export class UsersService {
   public async findMe(id: number): Promise<SafeUser> {
     const user = await this.findByIdOrThrow(id);
     return toSafeUser(user);
-  }
-
-  // ===== POST / SAVE METHODS =====
-
-  public save(user: User): Promise<User> {
-    return this.usersRepository.save(user);
   }
 
   // ===== PATCH METHODS =====
@@ -157,29 +179,6 @@ export class UsersService {
     const user = await this.findByIdOrThrow(id);
     user.isLocked = true;
     await this.save(user);
-  }
-
-  public async createMechanic(dto: CreateUserDto): Promise<SafeUser> {
-    // Check if email already exists
-    const existingUser = await this.findByEmail(dto.email);
-    if (existingUser) {
-      throw new ConflictException('Email already exists');
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(dto.password, 10);
-
-    // Create mechanic user
-    const mechanicUser = this.usersRepository.create({
-      email: dto.email,
-      password: hashedPassword,
-      name: dto.name,
-      role: ROLE.MECHANIC,
-      isEmailConfirmed: true, // Admin-created mechanics are automatically confirmed
-    });
-
-    const savedUser = await this.save(mechanicUser);
-    return toSafeUser(savedUser);
   }
 
   public async promoteToAdmin(id: number): Promise<void> {

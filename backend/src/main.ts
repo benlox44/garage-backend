@@ -10,7 +10,11 @@ const logger = new Logger('Bootstrap');
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true, // Strip properties that do not have any decorators
+    forbidNonWhitelisted: true, // Throw an error if non-whitelisted properties are present
+    transform: true, // Automatically transform payloads to be objects typed according to their DTO classes
+  }));
 
   const clientOrigin = required('CLIENT_URL');
   app.enableCors({

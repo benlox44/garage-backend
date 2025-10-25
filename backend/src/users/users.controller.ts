@@ -19,7 +19,7 @@ import { SafeUser } from './types/safe-user.type.js';
 import { UsersService } from './users.service.js';
 
 import { CreateUserDto } from '../auth/dto/create-user.dto.js';
-import { AdminGuard } from '../auth/guards/admin.guard.js';
+import { RoleGuard, Roles } from '../guards/role.guard.js';
 import { CurrentUser } from '../jwt/decorators/current-user.decorator.js';
 import { JwtPayload } from '../jwt/types/jwt-payload.type.js';
 
@@ -90,31 +90,33 @@ export class UsersController {
 
   // ===== ADMIN ACTIONS =====
 
-  @UseGuards(AuthGuard('jwt'), AdminGuard)
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles('ADMIN')
+  @Post('create-mechanic')
+  public async createMechanic(
+    @Body() dto: CreateUserDto,
+  ): Promise<{ message: string }> {
+    await this.usersService.createMechanic(dto);
+    return { 
+      message: 'Mechanic created successfully'
+    };
+  }
+
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles('ADMIN')
   @Get()
   public async findAll(): Promise<{ data: SafeUser[] }> {
     const data = await this.usersService.findAll();
     return { data };
   }
 
-  @UseGuards(AuthGuard('jwt'), AdminGuard)
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles('ADMIN')
   @Delete(':id')
   public async deleteById(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<{ message: string }> {
     await this.usersService.delete(id);
     return { message: `User with ID ${id} deleted successfully` };
-  }
-
-  @UseGuards(AuthGuard('jwt'), AdminGuard)
-  @Post('create-mechanic')
-  public async createMechanic(
-    @Body() dto: CreateUserDto,
-  ): Promise<{ message: string; data: SafeUser }> {
-    const data = await this.usersService.createMechanic(dto);
-    return { 
-      message: 'Mechanic created successfully',
-      data 
-    };
   }
 }

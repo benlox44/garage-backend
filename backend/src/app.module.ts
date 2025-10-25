@@ -7,6 +7,8 @@ import { required } from './common/config/env.config.js';
 import { GlobalJwtModule } from './jwt/jwt.module.js';
 import { User } from './users/entities/user.entity.js';
 import { UsersModule } from './users/users.module.js';
+import { Vehicle } from './vehicles/entities/vehicle.entity.js';
+import { VehiclesModule } from './vehicles/vehicles.module.js';
 
 @Module({
   imports: [
@@ -17,7 +19,7 @@ import { UsersModule } from './users/users.module.js';
       username: required('DATABASE_USER'),
       password: required('DATABASE_PASSWORD'),
       database: required('DATABASE_NAME'),
-      entities: [User],
+      entities: [User, Vehicle],
       // Use env flag to control schema sync (never enable in production)
       synchronize: process.env.DB_SYNCHRONIZE === 'true',
       // Enable SSL for managed clouds like Azure when DATABASE_SSL=true
@@ -25,6 +27,7 @@ import { UsersModule } from './users/users.module.js';
     }),
     GlobalJwtModule,
     UsersModule,
+    VehiclesModule,
     AuthModule,
     ScheduleModule.forRoot(),
   ],

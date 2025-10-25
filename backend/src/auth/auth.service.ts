@@ -46,98 +46,6 @@ export class AuthService {
     private readonly usersRedisService: UsersRedisService,
   ) {}
 
-  // ===== GET METHODS (Token-based actios) =====
-
-  public async confirmEmail(token: string): Promise<void> {
-    const payload = await this.jwtService.verify(
-      token,
-      JWT_PURPOSE.CONFIRM_EMAIL,
-    );
-    const user = await this.usersService.findByIdOrThrow(payload.sub);
-
-    if (user.isEmailConfirmed)
-      throw new BadRequestException('Email Already confirmed');
-
-    user.isEmailConfirmed = true;
-    await this.usersService.save(user);
-    await this.jwtService.markAsUsed(payload.jti, JWT_EXPIRES_IN.CONFIRM_EMAIL);
-  }
-
-  public async confirmEmailUpdate(token: string): Promise<void> {
-    const payload = await this.jwtService.verify(
-      token,
-      JWT_PURPOSE.CONFIRM_EMAIL_UPDATE,
-    );
-    const user = await this.usersService.findByIdOrThrow(payload.sub);
-
-    if (user.newEmail !== payload.email)
-      throw new BadRequestException(
-        'This confirmation link is no longer valid',
-      );
-
-    user.oldEmail = user.email;
-    user.email = user.newEmail!;
-    user.newEmail = null;
-    user.emailChangedAt = new Date();
-    await this.usersService.save(user);
-
-    const revertToken = this.jwtService.sign(
-      { purpose: JWT_PURPOSE.REVERT_EMAIL, sub: user.id, email: user.oldEmail },
-      JWT_EXPIRES_IN.REVERT_EMAIL,
-    );
-    await this.mailService.sendRevertEmailChange(user.oldEmail, revertToken);
-    await this.jwtService.markAsUsed(
-      payload.jti,
-      JWT_EXPIRES_IN.CONFIRM_EMAIL_UPDATE,
-    );
-  }
-
-  public async revertEmail(token: string): Promise<string> {
-    const payload = await this.jwtService.verify(
-      token,
-      JWT_PURPOSE.REVERT_EMAIL,
-    );
-    const user = await this.usersService.findByIdOrThrow(payload.sub);
-
-    /** Token expires in 30d, and change is allowed only once per 30d
-    no extra checks needed */
-    user.email = user.oldEmail!;
-    user.oldEmail = null;
-    user.emailChangedAt = null;
-
-    await this.usersService.save(user);
-    await this.jwtService.markAsUsed(payload.jti, JWT_EXPIRES_IN.REVERT_EMAIL);
-
-    return this.jwtService.sign(
-      {
-        purpose: JWT_PURPOSE.RESET_PASSWORD_AFTER_REVERT,
-        sub: user.id,
-        email: user.email,
-      },
-      JWT_EXPIRES_IN.RESET_PASSWORD,
-    );
-  }
-
-  public async unlockAccount(token: string): Promise<void> {
-    const payload = await this.jwtService.verify(
-      token,
-      JWT_PURPOSE.UNLOCK_ACCOUNT,
-    );
-    const user = await this.usersService.findByIdOrThrow(payload.sub);
-
-    if (!user.isLocked) {
-      throw new BadRequestException('Account is already unlocked');
-    }
-
-    user.isLocked = false;
-    await this.usersService.save(user);
-
-    await this.jwtService.markAsUsed(
-      payload.jti,
-      JWT_EXPIRES_IN.UNLOCK_ACCOUNT,
-    );
-  }
-
   // ===== POST METHODS (Credentials, registration & recovery) =====
 
   public async create(dto: CreateUserDto): Promise<void> {
@@ -257,6 +165,98 @@ export class AuthService {
       JWT_EXPIRES_IN.UNLOCK_ACCOUNT,
     );
     await this.mailService.sendUnlockAccount(user.email, token);
+  }
+
+  // ===== GET METHODS (Token-based actios) =====
+
+  public async confirmEmail(token: string): Promise<void> {
+    const payload = await this.jwtService.verify(
+      token,
+      JWT_PURPOSE.CONFIRM_EMAIL,
+    );
+    const user = await this.usersService.findByIdOrThrow(payload.sub);
+
+    if (user.isEmailConfirmed)
+      throw new BadRequestException('Email Already confirmed');
+
+    user.isEmailConfirmed = true;
+    await this.usersService.save(user);
+    await this.jwtService.markAsUsed(payload.jti, JWT_EXPIRES_IN.CONFIRM_EMAIL);
+  }
+
+  public async confirmEmailUpdate(token: string): Promise<void> {
+    const payload = await this.jwtService.verify(
+      token,
+      JWT_PURPOSE.CONFIRM_EMAIL_UPDATE,
+    );
+    const user = await this.usersService.findByIdOrThrow(payload.sub);
+
+    if (user.newEmail !== payload.email)
+      throw new BadRequestException(
+        'This confirmation link is no longer valid',
+      );
+
+    user.oldEmail = user.email;
+    user.email = user.newEmail!;
+    user.newEmail = null;
+    user.emailChangedAt = new Date();
+    await this.usersService.save(user);
+
+    const revertToken = this.jwtService.sign(
+      { purpose: JWT_PURPOSE.REVERT_EMAIL, sub: user.id, email: user.oldEmail },
+      JWT_EXPIRES_IN.REVERT_EMAIL,
+    );
+    await this.mailService.sendRevertEmailChange(user.oldEmail, revertToken);
+    await this.jwtService.markAsUsed(
+      payload.jti,
+      JWT_EXPIRES_IN.CONFIRM_EMAIL_UPDATE,
+    );
+  }
+
+  public async revertEmail(token: string): Promise<string> {
+    const payload = await this.jwtService.verify(
+      token,
+      JWT_PURPOSE.REVERT_EMAIL,
+    );
+    const user = await this.usersService.findByIdOrThrow(payload.sub);
+
+    /** Token expires in 30d, and change is allowed only once per 30d
+    no extra checks needed */
+    user.email = user.oldEmail!;
+    user.oldEmail = null;
+    user.emailChangedAt = null;
+
+    await this.usersService.save(user);
+    await this.jwtService.markAsUsed(payload.jti, JWT_EXPIRES_IN.REVERT_EMAIL);
+
+    return this.jwtService.sign(
+      {
+        purpose: JWT_PURPOSE.RESET_PASSWORD_AFTER_REVERT,
+        sub: user.id,
+        email: user.email,
+      },
+      JWT_EXPIRES_IN.RESET_PASSWORD,
+    );
+  }
+
+  public async unlockAccount(token: string): Promise<void> {
+    const payload = await this.jwtService.verify(
+      token,
+      JWT_PURPOSE.UNLOCK_ACCOUNT,
+    );
+    const user = await this.usersService.findByIdOrThrow(payload.sub);
+
+    if (!user.isLocked) {
+      throw new BadRequestException('Account is already unlocked');
+    }
+
+    user.isLocked = false;
+    await this.usersService.save(user);
+
+    await this.jwtService.markAsUsed(
+      payload.jti,
+      JWT_EXPIRES_IN.UNLOCK_ACCOUNT,
+    );
   }
 
   // ===== AUXILIARY METHODS =====

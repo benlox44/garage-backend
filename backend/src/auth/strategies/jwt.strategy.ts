@@ -4,7 +4,6 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { required } from '../../common/config/env.config.js';
 import { JWT_PURPOSE } from '../../common/constants/jwt-purpose.constant.js';
-
 import { AppJwtService } from '../../jwt/jwt.service.js';
 import { JwtPayload } from '../../jwt/types/jwt-payload.type.js';
 
