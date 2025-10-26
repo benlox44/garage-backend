@@ -1,6 +1,8 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
+import { Appointment } from '../../appointments/entities/appointment.entity.js';
 import { ROLE, type Role } from '../../common/constants/role.constant.js';
+import { MechanicSchedule } from '../../schedules/entities/mechanic-schedule.entity.js';
 
 @Entity()
 export class User {
@@ -36,4 +38,14 @@ export class User {
 
   @Column({ type: 'timestamp', nullable: true })
   public emailChangedAt: Date | null;
+
+  // Relaciones para sistema de citas
+  @OneToMany(() => MechanicSchedule, (schedule: MechanicSchedule) => schedule.mechanic)
+  public schedules: MechanicSchedule[];
+
+  @OneToMany(() => Appointment, (appointment: Appointment) => appointment.client)
+  public appointments: Appointment[];
+
+  @OneToMany(() => Appointment, (appointment: Appointment) => appointment.mechanic)
+  public mechanicAppointments: Appointment[];
 }

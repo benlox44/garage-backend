@@ -15,25 +15,14 @@ import { AuthGuard } from '@nestjs/passport';
 import { UpdateUserDto } from './dto/update-user-dto.js';
 import { UpdateUserEmailDto } from './dto/update-user-email.dto.js';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto.js';
-import { SafeUser } from './types/safe-user.type.js';
 import { UsersService } from './users.service.js';
 
 import { CreateUserDto } from '../auth/dto/create-user.dto.js';
+import { SafeUser } from '../common/index.js';
 import { RoleGuard, Roles } from '../guards/role.guard.js';
 import { CurrentUser } from '../jwt/decorators/current-user.decorator.js';
 import { JwtPayload } from '../jwt/types/jwt-payload.type.js';
 
-/**
- * UsersController
- *
- * Controller responsible for managing user-related endpoints.
- *
- * Exposes actions separated by role:
- * - ADMIN ACTIONS: Retrieve or delete any user.
- * - USER ACTIONS (ME): Update or delete own profile and credentials.
- *
- * Routes are protected by JWT authentication where necessary.
- */
 @Controller('users')
 export class UsersController {
   public constructor(private readonly usersService: UsersService) {}
@@ -76,7 +65,7 @@ export class UsersController {
     @Body() dto: UpdateUserEmailDto,
   ): Promise<{ message: string }> {
     await this.usersService.requestEmailUpdate(user.sub, dto);
-    return { message: 'Confirmation email sent to ' + dto.newEmail };
+    return { message: 'Confirmation email sent successfully' };
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -117,6 +106,6 @@ export class UsersController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<{ message: string }> {
     await this.usersService.delete(id);
-    return { message: `User with ID ${id} deleted successfully` };
+    return { message: 'User deleted successfully' };
   }
 }

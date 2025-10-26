@@ -21,14 +21,6 @@ import { VehicleOwnerGuard } from '../guards/vehicle-owner.guard.js';
 import { CurrentUser } from '../jwt/decorators/current-user.decorator.js';
 import { JwtPayload } from '../jwt/types/jwt-payload.type.js';
 
-/**
- * VehiclesController
- *
- * Controller responsible for managing client vehicles.
- * Only clients can access these endpoints.
- *
- * Endpoints organized by HTTP method: POST, GET, PATCH, DELETE
- */
 @Controller('users/me/vehicles')
 @UseGuards(AuthGuard('jwt'), RoleGuard)
 export class VehiclesController {
@@ -63,7 +55,7 @@ export class VehiclesController {
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateVehicleDto,
   ): Promise<{ message: string }> {
-    await this.vehiclesService.update(id, user.sub, dto);
+    await this.vehiclesService.update(id, dto);
     return {
       message: 'Vehicle updated successfully',
     };
@@ -76,7 +68,7 @@ export class VehiclesController {
     @CurrentUser() user: JwtPayload,
     @Param('id', ParseIntPipe) id: number,
   ): Promise<{ message: string }> {
-    await this.vehiclesService.remove(id, user.sub);
+    await this.vehiclesService.remove(id);
     return {
       message: 'Vehicle deleted successfully',
     };

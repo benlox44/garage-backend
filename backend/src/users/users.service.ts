@@ -13,13 +13,12 @@ import { UpdateUserDto } from './dto/update-user-dto.js';
 import { UpdateUserEmailDto } from './dto/update-user-email.dto.js';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto.js';
 import { User } from './entities/user.entity.js';
-import { SafeUser } from './types/safe-user.type.js';
-import { toSafeUser } from './utils/to-safe-user.js';
 
 import { CreateUserDto } from '../auth/dto/create-user.dto.js';
 import { JWT_EXPIRES_IN } from '../common/constants/jwt-expires-in.constant.js';
 import { JWT_PURPOSE } from '../common/constants/jwt-purpose.constant.js';  
 import { ROLE } from '../common/constants/role.constant.js';
+import { SafeUser, toSafeUser } from '../common/index.js';
 import { AppJwtService } from '../jwt/jwt.service.js';
 import { MailService } from '../mail/mail.service.js';
 

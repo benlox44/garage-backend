@@ -1,7 +1,6 @@
 import {
   Injectable,
   NotFoundException,
-  ForbiddenException,
   BadRequestException,
   ConflictException,
 } from '@nestjs/common';
@@ -22,7 +21,6 @@ export class VehiclesService {
   // ===== POST METHODS =====
 
   public async create(clientId: number, dto: CreateVehicleDto): Promise<void> {
-    // Verificar que no exista otro vehículo con la misma patente
     await this.ensureLicensePlateIsAvailable(dto.licensePlate);
 
     const vehicle = this.vehiclesRepository.create({
@@ -58,24 +56,15 @@ export class VehiclesService {
 
   public async update(
     id: number,
-    clientId: number,
     dto: UpdateVehicleDto,
   ): Promise<void> {
     const vehicle = await this.findOne(id);
 
-    // Verificar que el vehículo pertenezca al cliente
-    if (vehicle.clientId !== clientId) {
-      throw new ForbiddenException('You can only update your own vehicles');
-    }
-
-    // Verificar que el nuevo color sea diferente al actual
     if (dto.color && dto.color === vehicle.color) {
       throw new BadRequestException(
         'New color must be different from the current one',
       );
     }
-
-    // Actualizar campos
     Object.assign(vehicle, dto);
 
     await this.vehiclesRepository.save(vehicle);
@@ -83,13 +72,8 @@ export class VehiclesService {
 
   // ===== DELETE METHODS =====
 
-  public async remove(id: number, clientId: number): Promise<void> {
+  public async remove(id: number): Promise<void> {
     const vehicle = await this.findOne(id);
-
-    // Verificar que el vehículo pertenezca al cliente
-    if (vehicle.clientId !== clientId) {
-      throw new ForbiddenException('You can only delete your own vehicles');
-    }
 
     await this.vehiclesRepository.remove(vehicle);
   }

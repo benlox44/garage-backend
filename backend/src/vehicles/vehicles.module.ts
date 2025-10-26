@@ -5,8 +5,6 @@ import { Vehicle } from './entities/vehicle.entity.js';
 import { VehiclesController } from './vehicles.controller.js';
 import { VehiclesService } from './vehicles.service.js';
 
-import { RoleGuard } from '../guards/role.guard.js';
-import { VehicleOwnerGuard } from '../guards/vehicle-owner.guard.js';
 import { UsersModule } from '../users/users.module.js';
 
 @Module({
@@ -15,7 +13,7 @@ import { UsersModule } from '../users/users.module.js';
     UsersModule, // Para los guards
   ],
   controllers: [VehiclesController],
-  providers: [VehiclesService, RoleGuard, VehicleOwnerGuard],
+  providers: [VehiclesService],
   exports: [VehiclesService],
 })
 export class VehiclesModule {}
