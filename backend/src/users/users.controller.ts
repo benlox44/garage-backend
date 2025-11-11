@@ -15,6 +15,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { UpdateUserDto } from './dto/update-user-dto.js';
 import { UpdateUserEmailDto } from './dto/update-user-email.dto.js';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto.js';
+import { UpdateUserRoleDto } from './dto/update-user-role.dto.js';
 import { UsersService } from './users.service.js';
 
 import { CreateUserDto } from '../auth/dto/create-user.dto.js';
@@ -87,7 +88,7 @@ export class UsersController {
   ): Promise<{ message: string }> {
     await this.usersService.createMechanic(dto);
     return { 
-      message: 'Mechanic created successfully'
+      message: 'Mechanic created successfully. Confirmation email sent to ' + dto.email
     };
   }
 
@@ -97,6 +98,17 @@ export class UsersController {
   public async findAll(): Promise<{ data: SafeUser[] }> {
     const data = await this.usersService.findAll();
     return { data };
+  }
+
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles('ADMIN')
+  @Patch(':id/role')
+  public async updateUserRole(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateUserRoleDto,
+  ): Promise<{ message: string }> {
+    await this.usersService.updateUserRole(id, dto.role);
+    return { message: 'User role updated successfully' };
   }
 
   @UseGuards(AuthGuard('jwt'), RoleGuard)

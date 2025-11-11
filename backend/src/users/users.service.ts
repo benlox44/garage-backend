@@ -66,16 +66,23 @@ export class UsersService {
     // Hash password
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-    // Create mechanic user
+    // Create mechanic user with email unconfirmed
     const mechanicUser = this.usersRepository.create({
       email: dto.email,
       password: hashedPassword,
       name: dto.name,
       role: ROLE.MECHANIC,
-      isEmailConfirmed: true, // Admin-created mechanics are automatically confirmed
+      isEmailConfirmed: false, // Require email confirmation like regular users
     });
 
-    await this.save(mechanicUser);
+    const savedUser = await this.save(mechanicUser);
+
+    // Send confirmation email
+    const token = this.jwtService.sign(
+      { purpose: JWT_PURPOSE.CONFIRM_EMAIL, sub: savedUser.id, email: savedUser.email },
+      JWT_EXPIRES_IN.CONFIRM_EMAIL,
+    );
+    await this.mailService.sendConfirmationEmail(savedUser.email, token);
   }
 
   // ===== GET METHODS =====
@@ -183,6 +190,12 @@ export class UsersService {
   public async promoteToAdmin(id: number): Promise<void> {
     const user = await this.findByIdOrThrow(id);
     user.role = ROLE.ADMIN;
+    await this.save(user);
+  }
+
+  public async updateUserRole(id: number, role: string): Promise<void> {
+    const user = await this.findByIdOrThrow(id);
+    user.role = role as any;
     await this.save(user);
   }
 
