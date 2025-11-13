@@ -11,6 +11,8 @@ import { CreateVehicleDto } from './dto/create-vehicle.dto.js';
 import { UpdateVehicleDto } from './dto/update-vehicle.dto.js';
 import { Vehicle } from './entities/vehicle.entity.js';
 
+import { type VehicleStatus } from '../common/constants/vehicle-status.constant.js';
+
 @Injectable()
 export class VehiclesService {
   public constructor(
@@ -76,6 +78,14 @@ export class VehiclesService {
     const vehicle = await this.findOne(id);
 
     await this.vehiclesRepository.remove(vehicle);
+  }
+
+  // ===== STATUS METHODS =====
+
+  public async updateStatus(id: number, status: VehicleStatus): Promise<void> {
+    const vehicle = await this.findOne(id);
+    vehicle.status = status;
+    await this.vehiclesRepository.save(vehicle);
   }
 
   // ===== AUXILIARY METHODS =====

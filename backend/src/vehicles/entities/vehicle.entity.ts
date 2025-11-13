@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
+import { type VehicleStatus } from '../../common/constants/vehicle-status.constant.js';
 import { User } from '../../users/entities/user.entity.js';
 
 @Entity()
@@ -24,6 +25,9 @@ export class Vehicle {
 
   @Column()
   public color: string;
+
+  @Column({ type: 'varchar', default: 'available' })
+  public status: VehicleStatus;
 
   @Column()
   public clientId: number;
