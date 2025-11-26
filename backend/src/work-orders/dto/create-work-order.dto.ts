@@ -24,8 +24,12 @@ export class CreateWorkOrderItemDto {
 
 export class CreateWorkOrderDto {
   @IsInt()
-  @IsNotEmpty()
-  public vehicleId: number;
+  @IsOptional()
+  public vehicleId?: number;
+
+  @IsString()
+  @IsOptional()
+  public licensePlate?: string;
 
   @IsString()
   @IsNotEmpty()

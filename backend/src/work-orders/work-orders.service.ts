@@ -36,19 +36,26 @@ export class WorkOrdersService {
     mechanicId: number,
     createWorkOrderDto: CreateWorkOrderDto
   ): Promise<WorkOrder> {
-    const { vehicleId, description, requestedServices, estimatedCost, items } = createWorkOrderDto;
+    const { vehicleId, licensePlate, description, requestedServices, estimatedCost, items } = createWorkOrderDto;
 
     const mechanic = await this.usersService.findByIdOrThrow(mechanicId);
     if (mechanic.role !== ROLE.MECHANIC) {
       throw new BadRequestException('Only mechanics can create work orders');
     }
 
-    const vehicle = await this.vehiclesService.findOne(vehicleId);
+    let vehicle;
+    if (licensePlate) {
+      vehicle = await this.vehiclesService.findByLicensePlate(licensePlate);
+    } else if (vehicleId) {
+      vehicle = await this.vehiclesService.findOne(vehicleId);
+    } else {
+      throw new BadRequestException('Either vehicleId or licensePlate must be provided');
+    }
 
     const workOrder = this.workOrderRepository.create({
       mechanicId,
       clientId: vehicle.clientId,
-      vehicleId,
+      vehicleId: vehicle.id,
       description,
       requestedServices,
       estimatedCost,
@@ -74,14 +81,14 @@ export class WorkOrdersService {
       await this.workOrderItemRepository.save(workOrderItems);
     }
 
-    await this.vehiclesService.updateStatus(vehicleId, VEHICLE_STATUS.IN_SERVICE);
+    await this.vehiclesService.updateStatus(vehicle.id, VEHICLE_STATUS.IN_SERVICE);
 
     await this.notificationsService.createNotification({
       userId: vehicle.clientId,
       type: NOTIFICATION_TYPE.WORK_ORDER_CREATED,
       title: 'Nueva orden de trabajo',
       message: `Se ha creado una nueva orden de trabajo para su vehículo ${vehicle.brand} ${vehicle.model}`,
-      metadata: { workOrderId: savedWorkOrder.id, vehicleId }
+      metadata: { workOrderId: savedWorkOrder.id, vehicleId: vehicle.id }
     });
 
     return this.getWorkOrderById(savedWorkOrder.id);
@@ -99,6 +106,15 @@ export class WorkOrdersService {
     }
 
     return workOrder;
+  }
+
+  public async getWorkOrdersByLicensePlate(licensePlate: string): Promise<WorkOrder[]> {
+    const vehicle = await this.vehiclesService.findByLicensePlate(licensePlate);
+    return this.workOrderRepository.find({
+      where: { vehicleId: vehicle.id },
+      relations: ['client', 'mechanic', 'vehicle', 'items'],
+      order: { createdAt: 'DESC' }
+    });
   }
 
   public async getWorkOrdersByClient(clientId: number): Promise<WorkOrder[]> {

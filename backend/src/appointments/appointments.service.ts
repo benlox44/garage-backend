@@ -32,17 +32,17 @@ export class AppointmentsService {
     // Validate that mechanicId is actually a mechanic
     const mechanic = await this.usersService.findByIdOrThrow(mechanicId);
     if (mechanic.role !== ROLE.MECHANIC) {
-      throw new BadRequestException('The selected user is not a mechanic');
+      throw new BadRequestException('El usuario seleccionado no es un mecánico');
     }
 
     const vehicle = await this.vehiclesService.findOne(vehicleId);
     if (vehicle.clientId !== clientId) {
-      throw new ForbiddenException('You cannot schedule appointments for vehicles that do not belong to you');
+      throw new ForbiddenException('No puedes agendar citas para vehículos que no te pertenecen');
     }
 
     const schedule = await this.schedulesService.getScheduleById(scheduleId);
     if (!schedule.availableHours.includes(hour)) {
-      throw new BadRequestException('The selected hour is not available');
+      throw new BadRequestException('La hora seleccionada no está disponible');
     }
 
     const appointment = this.appointmentRepository.create({
@@ -90,12 +90,12 @@ export class AppointmentsService {
     });
 
     if (!appointment) {
-      throw new NotFoundException('Appointment not found');
+      throw new NotFoundException('Cita no encontrada');
     }
 
     // Only the assigned mechanic can update the appointment
     if (appointment.mechanicId !== mechanicId) {
-      throw new ForbiddenException('You cannot modify appointments that have not been assigned to you');
+      throw new ForbiddenException('No puedes modificar citas que no te han sido asignadas');
     }
 
     // Only pending appointments can be updated
@@ -156,17 +156,17 @@ export class AppointmentsService {
     });
 
     if (!appointment) {
-      throw new NotFoundException('Appointment not found');
+      throw new NotFoundException('Cita no encontrada');
     }
 
     // Only the assigned mechanic can reject the appointment
     if (appointment.mechanicId !== mechanicId) {
-      throw new ForbiddenException('You cannot modify appointments that have not been assigned to you');
+      throw new ForbiddenException('No puedes modificar citas que no te han sido asignadas');
     }
 
     // Only pending appointments can be rejected
     if (appointment.status !== APPOINTMENT_STATUS.PENDING) {
-      throw new BadRequestException('Only pending appointments can be rejected');
+      throw new BadRequestException('Solo las citas pendientes pueden ser rechazadas');
     }
 
     appointment.status = APPOINTMENT_STATUS.REJECTED;
@@ -187,7 +187,7 @@ export class AppointmentsService {
     });
 
     if (!appointment) {
-      throw new NotFoundException('Appointment not found');
+      throw new NotFoundException('Cita no encontrada');
     }
 
     return appointment;
@@ -198,11 +198,11 @@ export class AppointmentsService {
 
     // Only the client can cancel their own appointment and only if it's pending
     if (appointment.clientId !== userId) {
-      throw new ForbiddenException('You cannot cancel appointments that do not belong to you');
+      throw new ForbiddenException('No puedes cancelar citas que no te pertenecen');
     }
 
     if (appointment.status !== APPOINTMENT_STATUS.PENDING && appointment.status !== APPOINTMENT_STATUS.ACCEPTED) {
-      throw new BadRequestException('Only pending or accepted appointments can be cancelled');
+      throw new BadRequestException('Solo las citas pendientes o aceptadas pueden ser canceladas');
     }
 
     // Delete the appointment

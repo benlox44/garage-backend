@@ -2,16 +2,22 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn
 } from 'typeorm';
 
 import { User } from '../../users/entities/user.entity.js';
+import { WorkOrder } from './work-order.entity.js';
 
 @Entity('work_order_notes')
 export class WorkOrderNote {
   @PrimaryGeneratedColumn()
   public id: number;
+
+  @ManyToOne(() => WorkOrder, workOrder => workOrder.notes, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'workOrderId' })
+  public workOrder: any;
 
   @Column()
   public workOrderId: number;

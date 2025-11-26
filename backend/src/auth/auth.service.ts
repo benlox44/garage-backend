@@ -263,7 +263,7 @@ export class AuthService {
 
   private async validateUserCredentials(dto: LoginDto): Promise<User> {
     const user = await this.usersService.findByEmail(dto.email);
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+    if (!user) throw new UnauthorizedException('Account does not exist');
 
     if (user.isLocked) throw new ForbiddenException('Account is locked');
 

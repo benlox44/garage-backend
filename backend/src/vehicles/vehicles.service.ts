@@ -54,6 +54,20 @@ export class VehiclesService {
     return vehicle;
   }
 
+  public async findByLicensePlate(licensePlate: string): Promise<Vehicle> {
+    const vehicle = await this.vehiclesRepository.findOne({
+      where: { licensePlate },
+    });
+
+    if (!vehicle) {
+      throw new NotFoundException(
+        `Vehicle with license plate ${licensePlate} not found`,
+      );
+    }
+
+    return vehicle;
+  }
+
   // ===== PATCH METHODS =====
 
   public async update(
@@ -62,11 +76,6 @@ export class VehiclesService {
   ): Promise<void> {
     const vehicle = await this.findOne(id);
 
-    if (dto.color && dto.color === vehicle.color) {
-      throw new BadRequestException(
-        'New color must be different from the current one',
-      );
-    }
     Object.assign(vehicle, dto);
 
     await this.vehiclesRepository.save(vehicle);

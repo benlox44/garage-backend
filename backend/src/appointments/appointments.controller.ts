@@ -25,7 +25,7 @@ export class AppointmentsController {
   ): Promise<{ message: string }> {
     await this.appointmentsService.createAppointment(req.user.sub, createAppointmentDto);
     return { 
-      message: 'Appointment scheduled successfully'
+      message: 'Cita agendada exitosamente'
     };
   }
 
@@ -68,7 +68,7 @@ export class AppointmentsController {
       updateAppointmentDto
     );
     return { 
-      message: 'Appointment updated successfully'
+      message: 'Cita actualizada exitosamente'
     };
   }
 
@@ -81,7 +81,7 @@ export class AppointmentsController {
   ): Promise<{ message: string }> {
     await this.appointmentsService.acceptAppointment(id, req.user.sub);
     return { 
-      message: 'Appointment accepted successfully'
+      message: 'Cita aceptada exitosamente'
     };
   }
 
@@ -95,7 +95,7 @@ export class AppointmentsController {
   ): Promise<{ message: string }> {
     await this.appointmentsService.rejectAppointment(id, req.user.sub, rejectAppointmentDto);
     return { 
-      message: 'Appointment rejected successfully'
+      message: 'Cita rechazada exitosamente'
     };
   }
 
@@ -107,6 +107,6 @@ export class AppointmentsController {
     @Request() req: AuthRequest
   ): Promise<{ message: string }> {
     await this.appointmentsService.deleteAppointment(id, req.user.sub);
-    return { message: 'Appointment cancelled successfully' };
+    return { message: 'Cita cancelada exitosamente' };
   }
 }

@@ -53,10 +53,10 @@ export class WorkOrder {
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   public finalCost: number | null;
 
-  @OneToMany(() => WorkOrderItem, 'workOrderId', { cascade: true })
+  @OneToMany(() => WorkOrderItem, item => item.workOrder, { cascade: true })
   public items: WorkOrderItem[];
 
-  @OneToMany(() => WorkOrderNote, 'workOrderId', { cascade: true })
+  @OneToMany(() => WorkOrderNote, note => note.workOrder, { cascade: true })
   public notes: WorkOrderNote[];
 
   @CreateDateColumn()

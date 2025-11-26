@@ -48,6 +48,14 @@ export class WorkOrdersController {
     return { data: workOrders };
   }
 
+  @Get('vehicle/:licensePlate')
+  @UseGuards(RoleGuard)
+  @Roles(ROLE.MECHANIC, ROLE.CLIENT)
+  public async getWorkOrdersByLicensePlate(@Param('licensePlate') licensePlate: string): Promise<{ data: WorkOrder[] }> {
+    const workOrders = await this.workOrdersService.getWorkOrdersByLicensePlate(licensePlate);
+    return { data: workOrders };
+  }
+
   @Get(':id')
   public async getWorkOrderById(@Param('id') id: number): Promise<{ data: WorkOrder }> {
     const workOrder = await this.workOrdersService.getWorkOrderById(id);
