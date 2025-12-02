@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Patch, Delete, Param, UseGuards, Request } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 import { Notification } from './entities/notification.entity.js';
@@ -36,5 +36,14 @@ export class NotificationsController {
   public async markAllAsRead(@Request() req: AuthRequest): Promise<{ message: string }> {
     await this.notificationsService.markAllAsRead(req.user.sub);
     return { message: 'All notifications marked as read' };
+  }
+
+  @Delete(':id')
+  public async deleteNotification(
+    @Param('id') id: number,
+    @Request() req: AuthRequest
+  ): Promise<{ message: string }> {
+    await this.notificationsService.delete(id, req.user.sub);
+    return { message: 'Notification deleted' };
   }
 }

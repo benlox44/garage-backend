@@ -71,4 +71,8 @@ export class NotificationsService {
       { isRead: true }
     );
   }
+
+  public async delete(id: number, userId: number): Promise<void> {
+    await this.notificationRepository.delete({ id, userId });
+  }
 }

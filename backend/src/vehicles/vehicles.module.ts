@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Vehicle } from './entities/vehicle.entity.js';
 import { VehiclesController } from './vehicles.controller.js';
+import { VehiclesGeneralController } from './vehicles.general.controller.js';
 import { VehiclesService } from './vehicles.service.js';
 
 import { NotificationsModule } from '../notifications/notifications.module.js';
@@ -14,7 +15,7 @@ import { UsersModule } from '../users/users.module.js';
     UsersModule,
     forwardRef(() => NotificationsModule),
   ],
-  controllers: [VehiclesController],
+  controllers: [VehiclesController, VehiclesGeneralController],
   providers: [VehiclesService],
   exports: [VehiclesService],
 })
