@@ -69,19 +69,20 @@ export class AuthService {
     await this.mailService.sendConfirmationEmail(user.email, token);
   }
 
-  public async login(dto: LoginDto): Promise<string> {
+  public async login(dto: LoginDto): Promise<{ accessToken: string; user: User }> {
     const user = await this.validateUserCredentials(dto);
 
     // Promote to ADMIN if email matches ADMIN_EMAILS
     if (user.role !== ROLE.ADMIN && this.isAdminEmail(user.email)) {
       await this.usersService.promoteToAdmin(user.id);
+      user.role = ROLE.ADMIN; // Update local instance to reflect change
     }
 
-    const accesToken = this.jwtService.sign(
+    const accessToken = this.jwtService.sign(
       { purpose: JWT_PURPOSE.SESSION, sub: user.id, email: user.email },
       JWT_EXPIRES_IN.SESSION,
     );
-    return accesToken;
+    return { accessToken, user };
   }
 
   // Removed: requestConfirmationEmail. Tokens last 1 day; accounts older than

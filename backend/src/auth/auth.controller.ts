@@ -34,9 +34,11 @@ export class AuthController {
   }
 
   @Post('login')
-  public async login(@Body() dto: LoginDto): Promise<{ access_token: string }> {
-    const access_token = await this.authService.login(dto);
-    return { access_token };
+  public async login(@Body() dto: LoginDto): Promise<{ access_token: string; user: any }> {
+    const { accessToken, user } = await this.authService.login(dto);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...safeUser } = user;
+    return { access_token: accessToken, user: safeUser };
   }
 
   @Post('request-password-reset')
