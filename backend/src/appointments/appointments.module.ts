@@ -8,6 +8,7 @@ import { Appointment } from './entities/appointment.entity.js';
 import { SchedulesModule } from '../schedules/schedules.module.js';
 import { UsersModule } from '../users/users.module.js';
 import { VehiclesModule } from '../vehicles/vehicles.module.js';
+import { NotificationsModule } from '../notifications/notifications.module.js';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { VehiclesModule } from '../vehicles/vehicles.module.js';
     SchedulesModule,
     UsersModule,
     VehiclesModule,
+    NotificationsModule,
   ],
   controllers: [AppointmentsController],
   providers: [AppointmentsService],

@@ -1,8 +1,8 @@
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import 'dotenv/config';
 
 import { AppModule } from './app.module.js';
-import 'dotenv/config';
 import { required } from './common/config/env.config.js';
 
 const logger = new Logger('Bootstrap');

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { Notification } from './entities/notification.entity.js';
+import { NotificationsGateway } from './notifications.gateway.js';
 
 import { type NotificationType } from '../common/constants/notification-type.constant.js';
 
@@ -18,7 +19,8 @@ export interface CreateNotificationDto {
 export class NotificationsService {
   public constructor(
     @InjectRepository(Notification)
-    private readonly notificationRepository: Repository<Notification>
+    private readonly notificationRepository: Repository<Notification>,
+    private readonly notificationsGateway: NotificationsGateway
   ) {}
 
   public async createNotification(dto: CreateNotificationDto): Promise<Notification> {
@@ -30,7 +32,12 @@ export class NotificationsService {
       metadata: dto.metadata ?? null
     });
 
-    return await this.notificationRepository.save(notification);
+    const savedNotification = await this.notificationRepository.save(notification);
+
+    // Send real-time notification
+    this.notificationsGateway.sendNotificationToUser(dto.userId, savedNotification);
+
+    return savedNotification;
   }
 
   public async getNotificationsByUser(userId: number): Promise<Notification[]> {

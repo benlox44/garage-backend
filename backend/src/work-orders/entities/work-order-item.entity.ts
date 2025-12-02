@@ -23,6 +23,9 @@ export class WorkOrderItem {
   @Column()
   public name: string;
 
+  @Column({ nullable: true })
+  public inventoryItemId: number;
+
   @Column()
   public type: 'spare_part' | 'tool' | 'service';
 
