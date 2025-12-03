@@ -1,0 +1,449 @@
+# REST Client Variables
+
+// @host = https://garageucn
+@host = http://localhost:3000
+
+# Actual tokens after login
+@accessTokenAdmin = YOUR_ADMIN_TOKEN_HERE
+@accessTokenClient = YOUR_CLIENT_TOKEN_HERE
+@accessTokenMechanic = YOUR_MECHANIC_TOKEN_HERE
+
+# Generic token for general endpoints (works for any role)
+@accessToken = {{accessTokenClient}}
+
+# Email confirmation/reset tokens (get fhrom email links)
+@emailToken = TOKEN_FROM_EMAIL_HERE
+
+# ===== AUTH MODULE =====
+
+### Register new user (CLIENT by default)
+POST {{host}}/auth
+Content-Type: application/json
+
+{
+  "email": "benjagilberto44@gmail.com",
+  "password": "Password123!",
+  "name": "Cliente Uno"
+}
+
+### Login as ADMIN
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "benjamin.gilberto@alumnos.ucn.cl",
+  "password": "Password123!"
+}
+
+### Login as CLIENT
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "cliente1@example.com",
+  "password": "Password123!"
+}
+
+### Login as MECHANIC
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "mecanico1@example.com",
+  "password": "Password123!"
+}
+
+### Request password reset
+POST {{host}}/auth/request-password-reset
+Content-Type: application/json
+
+{
+  "email": "cliente1@example.com"
+}
+
+### Reset password (use token from email)
+POST {{host}}/auth/reset-password?token={{emailToken}}
+Content-Type: application/json
+
+{
+  "newPassword": "NewPassword123!"
+}
+
+### Reset password after email revert (use token from email)
+POST {{host}}/auth/reset-password-after-revert?token={{emailToken}}
+Content-Type: application/json
+
+{
+  "newPassword": "NewPassword123!"
+}
+
+### Request account unlock (after multiple failed logins)
+POST {{host}}/auth/request-unlock
+Content-Type: application/json
+
+{
+  "email": "cliente1@example.com"
+}
+
+### Confirm email (use token from email)
+GET {{host}}/auth/confirm-email?token={{emailToken}}
+
+### Confirm email update (use token from email)
+GET {{host}}/auth/confirm-email-update?token={{emailToken}}
+
+### Revert email change (use token from email)
+GET {{host}}/auth/revert-email?token={{emailToken}}
+
+### Unlock account (use token from email)
+GET {{host}}/auth/unlock-account?token={{emailToken}}
+
+# ===== USERS MODULE =====
+
+## User Actions (Any authenticated user - works for all roles)
+
+### Get own profile
+GET {{host}}/users/me
+Authorization: Bearer {{accessToken}}
+
+### Update own profile
+PATCH {{host}}/users/me
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Nombre Actualizado"
+}
+
+### Change own password
+PATCH {{host}}/users/me/password
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "currentPassword": "Password123!",
+  "newPassword": "NewPassword123!"
+}
+
+### Request own email change
+PATCH {{host}}/users/me/email
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "newEmail": "benjagilberto44@gmail.com",
+  "password": "Password123!"
+}
+
+### Delete own account
+DELETE {{host}}/users/me
+Authorization: Bearer {{accessToken}}
+
+## Admin Only Actions
+
+### List all users (filter by role)
+# Query params: ?role=CLIENT | ?role=MECHANIC | ?role=ADMIN
+GET {{host}}/users?role=CLIENT
+Authorization: Bearer {{accessTokenAdmin}}
+
+### Get user by ID
+GET {{host}}/users/2
+Authorization: Bearer {{accessTokenAdmin}}
+
+### Create new CLIENT
+POST {{host}}/users
+Authorization: Bearer {{accessTokenAdmin}}
+Content-Type: application/json
+
+{
+  "email": "cliente1@example.com",
+  "password": "Password123!",
+  "name": "Cliente Uno",
+  "role": "CLIENT"
+}
+
+### Create new MECHANIC
+POST {{host}}/users
+Authorization: Bearer {{accessTokenAdmin}}
+Content-Type: application/json
+
+{
+  "email": "mecanico1@example.com",
+  "password": "Password123!",
+  "name": "Mecánico Uno",
+  "role": "MECHANIC"
+}
+
+### Update user profile (Admin)
+PATCH {{host}}/users/2
+Authorization: Bearer {{accessTokenAdmin}}
+Content-Type: application/json
+
+{
+  "name": "Nombre Actualizado"
+}
+
+### Delete user by ID
+DELETE {{host}}/users/5
+Authorization: Bearer {{accessTokenAdmin}}
+
+# ===== VEHICLES MODULE =====
+
+### List vehicles (CLIENT sees only their own, MECHANIC/ADMIN see all)
+# Query params: ?clientId=2 | ?status=available | ?licensePlate=AA1234
+GET {{host}}/vehicles
+Authorization: Bearer {{accessToken}}
+
+### Get vehicle by ID
+GET {{host}}/vehicles/1
+Authorization: Bearer {{accessToken}}
+
+### Create vehicle (CLIENT only)
+POST {{host}}/vehicles
+Authorization: Bearer {{accessTokenClient}}
+Content-Type: application/json
+
+{
+  "licensePlate": "ABCD12",
+  "brand": "Toyota",
+  "model": "Corolla",
+  "year": 2020,
+  "color": "Rojo"
+}
+
+### Update vehicle (owner only)
+PATCH {{host}}/vehicles/1
+Authorization: Bearer {{accessTokenClient}}
+Content-Type: application/json
+
+{
+  "color": "Azul"
+}
+
+### Update vehicle status (MECHANIC only)
+PATCH {{host}}/vehicles/1/status
+Authorization: Bearer {{accessTokenMechanic}}
+Content-Type: application/json
+
+{
+  "status": "in_service"
+}
+
+### Delete vehicle (owner only)
+DELETE {{host}}/vehicles/1
+Authorization: Bearer {{accessTokenClient}}
+
+# ===== SCHEDULES MODULE =====
+
+### List schedules (MECHANIC sees own, CLIENT/ADMIN see all)
+# Query params: ?available=true | ?mechanicId=1 | ?date=2025-12-05
+GET {{host}}/schedules?available=true
+Authorization: Bearer {{accessToken}}
+
+### Get schedule by ID
+GET {{host}}/schedules/1
+Authorization: Bearer {{accessToken}}
+
+### Create schedule (MECHANIC only)
+POST {{host}}/schedules
+Authorization: Bearer {{accessTokenMechanic}}
+Content-Type: application/json
+
+{
+  "date": "2025-12-05",
+  "availableHours": ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"]
+}
+
+### Update schedule (MECHANIC only, own schedules)
+PATCH {{host}}/schedules/1
+Authorization: Bearer {{accessTokenMechanic}}
+Content-Type: application/json
+
+{
+  "availableHours": ["09:00", "10:00", "14:00", "15:00"]
+}
+
+### Delete schedule (MECHANIC only, own schedules)
+DELETE {{host}}/schedules/1
+Authorization: Bearer {{accessTokenMechanic}}
+
+# ===== APPOINTMENTS MODULE =====
+
+### List appointments (CLIENT sees own, MECHANIC sees assigned, ADMIN sees all)
+# Query params: ?status=pending | ?clientId=2 | ?mechanicId=1 | ?date=2025-12-05
+GET {{host}}/appointments?status=pending
+Authorization: Bearer {{accessToken}}
+
+### Get appointment by ID
+GET {{host}}/appointments/1
+Authorization: Bearer {{accessToken}}
+
+### Create appointment (CLIENT only)
+POST {{host}}/appointments
+Authorization: Bearer {{accessTokenClient}}
+Content-Type: application/json
+
+{
+  "mechanicId": 1,
+  "vehicleId": 1,
+  "scheduleId": 1,
+  "hour": "09:00",
+  "date": "2025-12-05",
+  "description": "Cambio de aceite y revisión de frenos"
+}
+
+### Accept appointment (MECHANIC only, own appointments)
+PATCH {{host}}/appointments/1
+Authorization: Bearer {{accessTokenMechanic}}
+Content-Type: application/json
+
+{
+  "status": "accepted"
+}
+
+### Reject appointment with reason (MECHANIC only)
+PATCH {{host}}/appointments/1
+Authorization: Bearer {{accessTokenMechanic}}
+Content-Type: application/json
+
+{
+  "status": "rejected",
+  "rejectionReason": "No tengo disponibilidad para este tipo de servicio"
+}
+
+### Cancel appointment (CLIENT only, deletes appointment)
+DELETE {{host}}/appointments/1
+Authorization: Bearer {{accessTokenClient}}
+
+# ===== WORK ORDERS MODULE =====
+
+### List work orders (CLIENT sees own, MECHANIC sees assigned, ADMIN sees all)
+# Query params: ?status=in_progress | ?clientId=2 | ?mechanicId=1 | ?licensePlate=ABCD12
+GET {{host}}/work-orders?status=pending_approval
+Authorization: Bearer {{accessToken}}
+
+### Get work order by ID
+GET {{host}}/work-orders/1
+Authorization: Bearer {{accessToken}}
+
+### Create work order (MECHANIC only)
+POST {{host}}/work-orders
+Authorization: Bearer {{accessTokenMechanic}}
+Content-Type: application/json
+
+{
+  "vehicleId": 1,
+  "description": "Cambio de aceite y revisión de frenos",
+  "requestedServices": ["Cambio de aceite", "Revisión de frenos", "Rotación de neumáticos"],
+  "estimatedCost": 50000,
+  "items": [
+    {
+      "name": "Aceite sintético 5W-30",
+      "type": "spare_part",
+      "quantity": 4,
+      "unitPrice": 5000,
+      "requiresApproval": false
+    },
+    {
+      "name": "Filtro de aceite",
+      "type": "spare_part",
+      "quantity": 1,
+      "unitPrice": 3000,
+      "requiresApproval": false
+    },
+    {
+      "name": "Reemplazo de pastillas de freno",
+      "type": "service",
+      "quantity": 1,
+      "unitPrice": 25000,
+      "requiresApproval": true
+    }
+  ]
+}
+
+### Update work order status (MECHANIC only, own work orders)
+PATCH {{host}}/work-orders/1
+Authorization: Bearer {{accessTokenMechanic}}
+Content-Type: application/json
+
+{
+  "status": "in_progress"
+}
+
+### Complete work order with final cost (MECHANIC only)
+PATCH {{host}}/work-orders/1
+Authorization: Bearer {{accessTokenMechanic}}
+Content-Type: application/json
+
+{
+  "status": "completed",
+  "finalCost": 55000
+}
+
+## Nested Resources - Items
+
+### Add items to work order (MECHANIC only, own work orders)
+POST {{host}}/work-orders/1/items
+Authorization: Bearer {{accessTokenMechanic}}
+Content-Type: application/json
+
+{
+  "items": [
+    {
+      "name": "Discos de freno nuevos",
+      "type": "spare_part",
+      "quantity": 2,
+      "unitPrice": 15000,
+      "requiresApproval": true
+    },
+    {
+      "name": "Líquido de frenos",
+      "type": "spare_part",
+      "quantity": 1,
+      "unitPrice": 8000,
+      "requiresApproval": false
+    }
+  ]
+}
+
+### Approve work order item (CLIENT only, own work orders)
+PATCH {{host}}/work-orders/1/items/1
+Authorization: Bearer {{accessTokenClient}}
+Content-Type: application/json
+
+{
+  "approved": true
+}
+
+## Nested Resources - Notes
+
+### Add note to work order (any authenticated user)
+POST {{host}}/work-orders/1/notes
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "content": "Las pastillas de freno están más desgastadas de lo esperado. Se recomienda también reemplazar los discos.",
+  "imageUrl": "https://example.com/foto-frenos.jpg"
+}
+
+# ===== NOTIFICATIONS MODULE =====
+
+### List all notifications
+GET {{host}}/notifications
+Authorization: Bearer {{accessToken}}
+
+### List unread notifications only
+GET {{host}}/notifications?read=false
+Authorization: Bearer {{accessToken}}
+
+### Mark all notifications as read
+GET {{host}}/notifications?markAllRead=true
+Authorization: Bearer {{accessToken}}
+
+### Get notification by ID
+GET {{host}}/notifications/1
+Authorization: Bearer {{accessToken}}
+
+### Mark specific notification as read
+PATCH {{host}}/notifications/1
+Authorization: Bearer {{accessToken}}

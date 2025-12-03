@@ -1,0 +1,54 @@
+# Dependencies (installed in container)
+node_modules
+
+# Build output (generated in container)
+dist
+build
+
+# Environment files (handled separately in docker-compose)
+.env
+.env.*
+
+# Version control
+.git
+.gitignore
+.github
+
+# Documentation
+README.md
+*.md
+
+# Docker files
+Dockerfile*
+.dockerignore
+docker-compose*.yml
+
+# REST Client files
+*.rest
+api.rest
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage
+.nyc_output
+
+# Logs
+*.log
+
+# Cache
+.npm
+.eslintcache
+.cache
+
+# Temporary
+tmp
+temp

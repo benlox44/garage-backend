@@ -1,39 +1,41 @@
-# Node.js dependencies
+# Dependencies
 node_modules/
 
 # Build outputs
 dist/
 build/
-out/
-.next/
 
 # Environment variables
-.env*
-*.local
+.env
+.env.local
+.env.*.local
 
 # TypeScript
 *.tsbuildinfo
-next-env.d.ts
 
 # Logs
 *.log
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
 pnpm-debug.log*
 
 # Docker volumes
 pgdata/
 
-# Miscellaneous system files
+# OS files
 .DS_Store
+Thumbs.db
 *.pem
 
-# Vercel deployment
-.vercel/
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
 
 # Testing
 coverage/
+.nyc_output/
 
-# REST Client files
-*.http
+# Azure deployment info
+azure-deployment-info.txt
