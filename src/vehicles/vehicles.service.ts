@@ -4,7 +4,7 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository, Like } from 'typeorm';
 
 import { CreateVehicleDto } from './dto/create-vehicle.dto.js';
 import { UpdateVehicleDto } from './dto/update-vehicle.dto.js';
@@ -94,6 +94,14 @@ export class VehiclesService {
     }
 
     return vehicle;
+  }
+
+  public async searchByLicensePlate(query: string): Promise<Vehicle[]> {
+    return await this.vehiclesRepository.find({
+      where: { licensePlate: Like(`%${query}%`) },
+      relations: ['client'],
+      take: 10,
+    });
   }
 
   // ===== PATCH METHODS =====

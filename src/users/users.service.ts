@@ -31,7 +31,11 @@ export class UsersService {
     private readonly mailService: MailService,
   ) {}
 
-  // ===== POST METHODS =====
+  public async findAdmins(): Promise<User[]> {
+    return await this.usersRepository.find({ where: { role: ROLE.ADMIN } });
+  }
+
+  // ===== GET METHODS =====
 
   public save(user: User): Promise<User> {
     return this.usersRepository.save(user);

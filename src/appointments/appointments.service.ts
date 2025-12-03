@@ -8,7 +8,9 @@ import { UpdateAppointmentDto } from './dto/update-appointment.dto.js';
 import { Appointment } from './entities/appointment.entity.js';
 
 import { APPOINTMENT_STATUS, type AppointmentStatus } from '../common/constants/appointment-status.constant.js';
+import { NOTIFICATION_TYPE, type NotificationType } from '../common/constants/notification-type.constant.js';
 import { ROLE } from '../common/constants/role.constant.js';
+import { NotificationsService } from '../notifications/notifications.service.js';
 import { SchedulesService } from '../schedules/schedules.service.js';
 import { UsersService } from '../users/users.service.js';
 import { VehiclesService } from '../vehicles/vehicles.service.js';
@@ -20,7 +22,8 @@ export class AppointmentsService {
     private readonly appointmentRepository: Repository<Appointment>,
     private readonly schedulesService: SchedulesService,
     private readonly usersService: UsersService,
-    private readonly vehiclesService: VehiclesService
+    private readonly vehiclesService: VehiclesService,
+    private readonly notificationsService: NotificationsService
   ) {}
 
   public async createAppointment(
@@ -58,6 +61,15 @@ export class AppointmentsService {
     const savedAppointment = await this.appointmentRepository.save(appointment);
 
     await this.schedulesService.removeHourFromSchedule(scheduleId, hour);
+
+    // Notify Mechanic
+    await this.notificationsService.createNotification({
+      userId: mechanicId,
+      type: NOTIFICATION_TYPE.APPOINTMENT_CREATED as NotificationType,
+      title: 'Nueva Cita Agendada',
+      message: `El cliente ha agendado una cita para el vehículo ${vehicle.licensePlate} el ${date} a las ${hour}`,
+      metadata: { appointmentId: savedAppointment.id }
+    });
 
     return savedAppointment;
   }
@@ -218,7 +230,18 @@ export class AppointmentsService {
     }
 
     appointment.status = APPOINTMENT_STATUS.ACCEPTED;
-    return await this.appointmentRepository.save(appointment);
+    const savedAppointment = await this.appointmentRepository.save(appointment);
+
+    // Notify Client
+    await this.notificationsService.createNotification({
+      userId: appointment.clientId,
+      type: NOTIFICATION_TYPE.APPOINTMENT_ACCEPTED as NotificationType,
+      title: 'Cita Aceptada',
+      message: `Tu cita para el vehículo ${appointment.vehicle.licensePlate} ha sido aceptada por el mecánico`,
+      metadata: { appointmentId: savedAppointment.id }
+    });
+
+    return savedAppointment;
   }
 
   public async rejectAppointment(
@@ -249,6 +272,15 @@ export class AppointmentsService {
     const savedAppointment = await this.appointmentRepository.save(appointment);
 
     await this.schedulesService.addHourToSchedule(appointment.scheduleId, appointment.hour);
+
+    // Notify Client
+    await this.notificationsService.createNotification({
+      userId: appointment.clientId,
+      type: NOTIFICATION_TYPE.APPOINTMENT_REJECTED as NotificationType,
+      title: 'Cita Rechazada',
+      message: `Tu cita ha sido rechazada. Razón: ${rejectAppointmentDto.rejectionReason}`,
+      metadata: { appointmentId: savedAppointment.id }
+    });
     
     return savedAppointment;
   }

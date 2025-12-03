@@ -6,6 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn
 } from 'typeorm';
+
 import { WorkOrder } from './work-order.entity.js';
 
 @Entity('work_order_items')
@@ -15,13 +16,16 @@ export class WorkOrderItem {
 
   @ManyToOne(() => WorkOrder, workOrder => workOrder.items, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'workOrderId' })
-  public workOrder: any;
+  public workOrder: WorkOrder;
 
   @Column()
   public workOrderId: number;
 
   @Column()
   public name: string;
+
+  @Column({ type: 'int', nullable: true })
+  public inventoryItemId: number | null;
 
   @Column()
   public type: 'spare_part' | 'tool' | 'service';

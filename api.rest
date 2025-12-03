@@ -447,3 +447,55 @@ Authorization: Bearer {{accessToken}}
 ### Mark specific notification as read
 PATCH {{host}}/notifications/1
 Authorization: Bearer {{accessToken}}
+
+# ===== INVENTORY MODULE =====
+
+### List all inventory items (ADMIN/MECHANIC only)
+GET {{host}}/inventory
+Authorization: Bearer {{accessToken}}
+
+### List low stock items (ADMIN/MECHANIC only)
+GET {{host}}/inventory/low-stock
+Authorization: Bearer {{accessToken}}
+
+### Get inventory item by ID (ADMIN/MECHANIC only)
+GET {{host}}/inventory/1
+Authorization: Bearer {{accessToken}}
+
+### Create inventory item (ADMIN only)
+POST {{host}}/inventory
+Authorization: Bearer {{accessTokenAdmin}}
+Content-Type: application/json
+
+{
+  "sku": "BRK-PAD-001",
+  "name": "Pastillas de Freno Delanteras",
+  "description": "Pastillas de freno para vehículos medianos",
+  "quantity": 20,
+  "minStock": 5,
+  "price": 25000
+}
+
+### Update inventory item (ADMIN only)
+PATCH {{host}}/inventory/1
+Authorization: Bearer {{accessTokenAdmin}}
+Content-Type: application/json
+
+{
+  "name": "Pastillas de Freno Delanteras Premium",
+  "price": 28000,
+  "minStock": 10
+}
+
+### Update stock (add or subtract) (ADMIN/MECHANIC)
+PATCH {{host}}/inventory/1/stock
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "delta": -2
+}
+
+### Delete inventory item (ADMIN only)
+DELETE {{host}}/inventory/1
+Authorization: Bearer {{accessTokenAdmin}}

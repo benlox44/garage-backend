@@ -6,6 +6,10 @@ export class CreateWorkOrderItemDto {
   @IsNotEmpty()
   public name: string;
 
+  @IsOptional()
+  @IsNumber()
+  public inventoryItemId?: number;
+
   @IsString()
   @IsNotEmpty()
   public type: 'spare_part' | 'tool' | 'service';

@@ -9,6 +9,7 @@ import { ResetPasswordAfterRevertDto } from './dto/reset-password-after-revert.d
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
 
 import { ApiResponse } from '../common/index.js';
+import { User } from '../users/entities/user.entity.js';
 
 @Controller('auth')
 export class AuthController {
@@ -29,12 +30,14 @@ export class AuthController {
   }
 
   @Post('login')
-  public async login(@Body() dto: LoginDto): Promise<ApiResponse<{ access_token: string }>> {
-    const access_token = await this.authService.login(dto);
+  public async login(@Body() dto: LoginDto): Promise<ApiResponse<{ access_token: string; user: Omit<User, 'password'> }>> {
+    const { accessToken, user } = await this.authService.login(dto);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...safeUser } = user;
     return {
       success: true,
       message: 'Login successful',
-      data: { access_token },
+      data: { access_token: accessToken, user: safeUser },
     };
   }
 

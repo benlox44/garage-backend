@@ -7,45 +7,57 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
+# Load .env variables properly (handle values with spaces and commas)
+if [ -f .env ]; then
+    while IFS='=' read -r key value; do
+        # Skip comments and empty lines
+        [[ $key =~ ^#.*$ ]] && continue
+        [[ -z $key ]] && continue
+        # Remove leading/trailing whitespace from value
+        value=$(echo "$value" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+        export "$key=$value"
+    done < .env
+fi
+
 echo -e "${YELLOW}========================================${NC}"
 echo -e "${YELLOW}  GARAGE BACKEND - AZURE DEPLOYMENT${NC}"
 echo -e "${YELLOW}========================================${NC}\n"
 
-# Variables de configuración de Azure
+# Azure Configuration (use .env or defaults)
 RESOURCE_GROUP="${AZURE_RESOURCE_GROUP:-garage-app-rg}"
 LOCATION="${AZURE_LOCATION:-eastus}"
 POSTGRES_LOCATION="${AZURE_POSTGRES_LOCATION:-westus}"
 ACR_NAME="${AZURE_ACR_NAME:-garageappregistry}"
 POSTGRES_SERVER="${AZURE_POSTGRES_SERVER:-garage-db-server}"
-POSTGRES_ADMIN="${AZURE_POSTGRES_ADMIN:-garage_admin}"
-POSTGRES_DB="${AZURE_POSTGRES_DB:-garage}"
+POSTGRES_ADMIN="${DATABASE_USER:-garage_admin}"
+POSTGRES_DB="${DATABASE_NAME:-garage}"
 REDIS_NAME="${AZURE_REDIS_NAME:-garage-redis}"
 CONTAINER_ENV="${AZURE_CONTAINER_ENV:-garage-env}"
 CONTAINER_APP="${AZURE_CONTAINER_APP:-garage-backend}"
 
-# Variables sensibles (deben estar en .env o variables de entorno)
+# Validate required variables from .env
 if [ -z "$POSTGRES_PASSWORD" ]; then
-    echo -e "${RED}❌ Error: POSTGRES_PASSWORD no está configurada${NC}"
-    echo -e "${YELLOW}Define las variables de entorno necesarias o agrégalas al .env${NC}"
+    echo -e "${RED}❌ Error: POSTGRES_PASSWORD not set${NC}"
+    echo -e "${YELLOW}Set it in .env file${NC}"
     exit 1
 fi
 
 if [ -z "$EMAIL_USER" ] || [ -z "$EMAIL_PASS" ]; then
-    echo -e "${RED}❌ Error: EMAIL_USER y EMAIL_PASS deben estar configuradas${NC}"
+    echo -e "${RED}❌ Error: EMAIL_USER and EMAIL_PASS must be set${NC}"
     exit 1
 fi
 
 if [ -z "$ADMIN_EMAILS" ]; then
-    echo -e "${RED}❌ Error: ADMIN_EMAILS debe estar configurada${NC}"
+    echo -e "${RED}❌ Error: ADMIN_EMAILS must be set${NC}"
     exit 1
 fi
 
 if [ -z "$CLIENT_URL" ]; then
-    echo -e "${RED}❌ Error: CLIENT_URL debe estar configurada${NC}"
+    echo -e "${RED}❌ Error: CLIENT_URL must be set${NC}"
     exit 1
 fi
 
-# JWT Secret (genera uno aleatorio)
+# Generate random JWT Secret for Azure
 JWT_SECRET=$(openssl rand -base64 32)
 
 echo -e "${GREEN}[1/9]${NC} Verificando login en Azure..."
@@ -128,6 +140,7 @@ az containerapp create \
     --image $ACR_NAME.azurecr.io/garage-backend:latest \
     --target-port 3000 \
     --ingress external \
+    --transport auto \
     --registry-server $ACR_NAME.azurecr.io \
     --registry-username $ACR_NAME \
     --registry-password $(az acr credential show --name $ACR_NAME --query "passwords[0].value" -o tsv) \
@@ -136,6 +149,12 @@ az containerapp create \
     --min-replicas 1 \
     --max-replicas 3 \
     --output table
+
+echo -e "\n${GREEN}Habilitando sticky sessions para WebSocket...${NC}"
+az containerapp ingress sticky-sessions set \
+    --name $CONTAINER_APP \
+    --resource-group $RESOURCE_GROUP \
+    --affinity sticky
 
 # Obtener URL de la app
 APP_URL=$(az containerapp show \

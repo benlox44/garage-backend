@@ -11,6 +11,8 @@ services:
     environment:
       - NODE_ENV=development
       - DB_SYNCHRONIZE=true
+      - DATABASE_HOST=db
+      - REDIS_HOST=redis
     volumes:
       - .:/app
       - /app/node_modules  # Exclude node_modules from volume mount

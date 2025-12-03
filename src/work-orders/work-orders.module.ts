@@ -10,13 +10,15 @@ import { WorkOrdersService } from './work-orders.service.js';
 import { NotificationsModule } from '../notifications/notifications.module.js';
 import { UsersModule } from '../users/users.module.js';
 import { VehiclesModule } from '../vehicles/vehicles.module.js';
+import { InventoryModule } from '../inventory/inventory.module.js';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([WorkOrder, WorkOrderItem, WorkOrderNote]),
     VehiclesModule,
     UsersModule,
-    NotificationsModule
+    NotificationsModule,
+    InventoryModule
   ],
   controllers: [WorkOrdersController],
   providers: [WorkOrdersService],

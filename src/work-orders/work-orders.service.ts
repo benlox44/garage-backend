@@ -14,6 +14,7 @@ import { NOTIFICATION_TYPE } from '../common/constants/notification-type.constan
 import { ROLE } from '../common/constants/role.constant.js';
 import { VEHICLE_STATUS } from '../common/constants/vehicle-status.constant.js';
 import { WORK_ORDER_STATUS, type WorkOrderStatus } from '../common/constants/work-order-status.constant.js';
+import { InventoryService } from '../inventory/inventory.service.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
 import { UsersService } from '../users/users.service.js';
 import { VehiclesService } from '../vehicles/vehicles.service.js';
@@ -29,7 +30,8 @@ export class WorkOrdersService {
     private readonly workOrderNoteRepository: Repository<WorkOrderNote>,
     private readonly vehiclesService: VehiclesService,
     private readonly usersService: UsersService,
-    private readonly notificationsService: NotificationsService
+    private readonly notificationsService: NotificationsService,
+    private readonly inventoryService: InventoryService
   ) {}
 
   public async createWorkOrder(
@@ -65,20 +67,29 @@ export class WorkOrdersService {
     const savedWorkOrder = await this.workOrderRepository.save(workOrder);
 
     if (items && items.length > 0) {
-      const workOrderItems = items.map(item => {
+      // Process items sequentially to handle async inventory updates
+      for (const item of items) {
         const totalPrice = item.quantity * item.unitPrice;
-        return this.workOrderItemRepository.create({
+        const inventoryId = item.inventoryItemId as number | undefined;
+        
+        // If inventory item is linked, decrease stock
+        if (inventoryId !== undefined) {
+          await this.inventoryService.updateStock(inventoryId, -item.quantity);
+        }
+
+        const workOrderItem = this.workOrderItemRepository.create({
           workOrderId: savedWorkOrder.id,
           name: item.name,
+          inventoryItemId: inventoryId ?? null,
           type: item.type,
           quantity: item.quantity,
           unitPrice: item.unitPrice,
           totalPrice,
           requiresApproval: item.requiresApproval ?? false
         });
-      });
-
-      await this.workOrderItemRepository.save(workOrderItems);
+        
+        await this.workOrderItemRepository.save(workOrderItem);
+      }
     }
 
     await this.vehiclesService.updateStatus(vehicle.id, VEHICLE_STATUS.IN_SERVICE);
@@ -217,18 +228,30 @@ export class WorkOrdersService {
       throw new ForbiddenException('You can only add items to your own work orders');
     }
 
-    const workOrderItems = addItemsDto.items.map(item => {
+    const workOrderItems: WorkOrderItem[] = [];
+
+    for (const item of addItemsDto.items) {
       const totalPrice = item.quantity * item.unitPrice;
-      return this.workOrderItemRepository.create({
+      const inventoryId = item.inventoryItemId as number | undefined;
+
+      // If inventory item is linked, decrease stock
+      if (inventoryId !== undefined) {
+        await this.inventoryService.updateStock(inventoryId, -item.quantity);
+      }
+
+      const workOrderItem = this.workOrderItemRepository.create({
         workOrderId: id,
         name: item.name,
+        inventoryItemId: inventoryId ?? null,
         type: item.type,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         totalPrice,
         requiresApproval: item.requiresApproval ?? false
       });
-    });
+      
+      workOrderItems.push(workOrderItem);
+    }
 
     await this.workOrderItemRepository.save(workOrderItems);
 
