@@ -18,7 +18,7 @@ async function bootstrap(): Promise<void> {
 
   const clientOrigin = required('CLIENT_URL');
   app.enableCors({
-    origin: [clientOrigin],
+    origin: clientOrigin.split(',').map((origin) => origin.trim()),
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     credentials: true,
